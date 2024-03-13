@@ -39,9 +39,12 @@ add_library(${PROJECT_NAME} SHARED ${SRCS_DBOW2} ${SRCS_DUTILS})
 target_include_directories(${PROJECT_NAME} PUBLIC include/DBoW2/ include/)
 target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBRARIES})
 
-add_executable(demo demo/demo.cpp)
+add_executable(demo executables/demo.cpp)
 target_link_libraries(demo ${PROJECT_NAME} ${OpenCV_LIBRARIES})
-file(COPY demo/images DESTINATION ${CMAKE_BINARY_DIR}/)
+file(COPY executables/images DESTINATION ${CMAKE_BINARY_DIR}/)
+
+add_executable(createVocabulary executables/createVocabulary.cpp)
+target_link_libraries(createVocabulary ${PROJECT_NAME} ${OpenCV_LIBRARIES})
 
 configure_file(src/DBoW2.cmake.in
   "${PROJECT_BINARY_DIR}/DBoW2Config.cmake" @ONLY)
