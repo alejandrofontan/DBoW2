@@ -1,8 +1,9 @@
 /**
- * File: FORB.h
- * Date: June 2012
- * Author: Dorian Galvez-Lopez
- * Description: functions for ORB descriptors
+ * File: FOrb.h
+ * Date: March 2024
+ * Original Author: Dorian Galvez-Lopez
+ * Modified by Alejandro Fontan Villacampa for AnyFeature-VSLAM
+ * Description: functions for Orb descriptors
  * License: see the LICENSE.txt file
  *
  */
@@ -19,12 +20,12 @@
 namespace DBoW2 {
 
 /// Functions to manipulate BRIEF descriptors
-class FORB: protected FClass
+class FOrb: protected FClass
 {
 public:
 
   /// Descriptor type
-  typedef cv::Mat TDescriptor; // CV_8U
+  typedef cv::Mat TDescriptor; 
   /// Pointer to a single descriptor
   typedef const TDescriptor *pDescriptor;
   /// Descriptor length (in bytes)

@@ -1,8 +1,9 @@
 /**
- * File: FORB.cpp
- * Date: June 2012
- * Author: Dorian Galvez-Lopez
- * Description: functions for ORB descriptors
+ * File: FOrb.cpp
+ * Date: March 2024
+ * Original Author: Dorian Galvez-Lopez
+ * Modified by Alejandro Fontan Villacampa for AnyFeature-VSLAM
+ * Description: functions for Orb descriptors
  * License: see the LICENSE.txt file
  *
  */
@@ -13,7 +14,7 @@
 #include <stdint.h>
 #include <limits.h>
 
-#include "FORB.h"
+#include "FOrb.h"
 
 using namespace std;
 
@@ -21,8 +22,8 @@ namespace DBoW2 {
 
 // --------------------------------------------------------------------------
 
-void FORB::meanValue(const std::vector<FORB::pDescriptor> &descriptors, 
-  FORB::TDescriptor &mean)
+void FOrb::meanValue(const std::vector<FOrb::pDescriptor> &descriptors, 
+  FOrb::TDescriptor &mean)
 {
   if(descriptors.empty())
   {
@@ -35,7 +36,7 @@ void FORB::meanValue(const std::vector<FORB::pDescriptor> &descriptors,
   }
   else
   {
-    vector<int> sum(FORB::L * 8, 0);
+    vector<int> sum(FOrb::L * 8, 0);
     
     for(size_t i = 0; i < descriptors.size(); ++i)
     {
@@ -55,7 +56,7 @@ void FORB::meanValue(const std::vector<FORB::pDescriptor> &descriptors,
       }
     }
     
-    mean = cv::Mat::zeros(1, FORB::L, CV_8U);
+    mean = cv::Mat::zeros(1, FOrb::L, CV_8U);
     unsigned char *p = mean.ptr<unsigned char>();
     
     const int N2 = (int)descriptors.size() / 2 + descriptors.size() % 2;
@@ -74,49 +75,31 @@ void FORB::meanValue(const std::vector<FORB::pDescriptor> &descriptors,
 
 // --------------------------------------------------------------------------
   
-double FORB::distance(const FORB::TDescriptor &a, 
-  const FORB::TDescriptor &b)
+double FOrb::distance(const FOrb::TDescriptor &a, 
+  const FOrb::TDescriptor &b)
 {
-  // Bit count function got from:
-  // http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetKernighan
-  // This implementation assumes that a.cols (CV_8U) % sizeof(uint64_t) == 0
-  
-  const uint64_t *pa, *pb;
-  pa = a.ptr<uint64_t>(); // a & b are actually CV_8U
-  pb = b.ptr<uint64_t>(); 
-  
-  uint64_t v, ret = 0;
-  for(size_t i = 0; i < a.cols / sizeof(uint64_t); ++i, ++pa, ++pb)
-  {
-    v = *pa ^ *pb;
-    v = v - ((v >> 1) & (uint64_t)~(uint64_t)0/3);
-    v = (v & (uint64_t)~(uint64_t)0/15*3) + ((v >> 2) & 
-      (uint64_t)~(uint64_t)0/15*3);
-    v = (v + (v >> 4)) & (uint64_t)~(uint64_t)0/255*15;
-    ret += (uint64_t)(v * ((uint64_t)~(uint64_t)0/255)) >> 
-      (sizeof(uint64_t) - 1) * CHAR_BIT;
-  }
-  
-  return static_cast<double>(ret);
-  
-  // // If uint64_t is not defined in your system, you can try this 
-  // // portable approach (requires DUtils from DLib)
-  // const unsigned char *pa, *pb;
-  // pa = a.ptr<unsigned char>();
-  // pb = b.ptr<unsigned char>();
-  // 
-  // int ret = 0;
-  // for(int i = 0; i < a.cols; ++i, ++pa, ++pb)
-  // {
-  //   ret += DUtils::LUT::ones8bits[ *pa ^ *pb ];
-  // }
-  //  
-  // return ret;
+    // Bit set count operation from
+    // http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetParallel
+
+    const int *pa = a.ptr<int32_t>();
+    const int *pb = b.ptr<int32_t>();
+
+    int dist=0;
+
+    for(int i=0; i<8; i++, pa++, pb++)
+    {
+        unsigned  int v = *pa ^ *pb;
+        v = v - ((v >> 1) & 0x55555555);
+        v = (v & 0x33333333) + ((v >> 2) & 0x33333333);
+        dist += (((v + (v >> 4)) & 0xF0F0F0F) * 0x1010101) >> 24;
+    }
+
+    return dist;
 }
 
 // --------------------------------------------------------------------------
   
-std::string FORB::toString(const FORB::TDescriptor &a)
+std::string FOrb::toString(const FOrb::TDescriptor &a)
 {
   stringstream ss;
   const unsigned char *p = a.ptr<unsigned char>();
@@ -131,13 +114,13 @@ std::string FORB::toString(const FORB::TDescriptor &a)
 
 // --------------------------------------------------------------------------
   
-void FORB::fromString(FORB::TDescriptor &a, const std::string &s)
+void FOrb::fromString(FOrb::TDescriptor &a, const std::string &s)
 {
-  a.create(1, FORB::L, CV_8U);
+  a.create(1, FOrb::L, CV_8U);
   unsigned char *p = a.ptr<unsigned char>();
   
   stringstream ss(s);
-  for(int i = 0; i < FORB::L; ++i, ++p)
+  for(int i = 0; i < FOrb::L; ++i, ++p)
   {
     int n;
     ss >> n;
@@ -150,7 +133,7 @@ void FORB::fromString(FORB::TDescriptor &a, const std::string &s)
 
 // --------------------------------------------------------------------------
 
-void FORB::toMat32F(const std::vector<TDescriptor> &descriptors, 
+void FOrb::toMat32F(const std::vector<TDescriptor> &descriptors, 
   cv::Mat &mat)
 {
   if(descriptors.empty())
@@ -161,7 +144,7 @@ void FORB::toMat32F(const std::vector<TDescriptor> &descriptors,
   
   const size_t N = descriptors.size();
   
-  mat.create(N, FORB::L*8, CV_32F);
+  mat.create(N, FOrb::L*8, CV_32F);
   float *p = mat.ptr<float>();
   
   for(size_t i = 0; i < N; ++i)
@@ -185,24 +168,24 @@ void FORB::toMat32F(const std::vector<TDescriptor> &descriptors,
 
 // --------------------------------------------------------------------------
 
-void FORB::toMat32F(const cv::Mat &descriptors, cv::Mat &mat)
+void FOrb::toMat32F(const cv::Mat &descriptors, cv::Mat &mat)
 {
   descriptors.convertTo(mat, CV_32F);
 }
 
 // --------------------------------------------------------------------------
 
-void FORB::toMat8U(const std::vector<TDescriptor> &descriptors, 
+void FOrb::toMat8U(const std::vector<TDescriptor> &descriptors, 
   cv::Mat &mat)
 {
-  mat.create(descriptors.size(), FORB::L, CV_8U);
+  mat.create(descriptors.size(), FOrb::L, CV_8U);
   
   unsigned char *p = mat.ptr<unsigned char>();
   
-  for(size_t i = 0; i < descriptors.size(); ++i, p += FORB::L)
+  for(size_t i = 0; i < descriptors.size(); ++i, p += FOrb::L)
   {
     const unsigned char *d = descriptors[i].ptr<unsigned char>();
-    std::copy(d, d + FORB::L, p);
+    std::copy(d, d + FOrb::L, p);
   }
   
 }

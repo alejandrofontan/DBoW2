@@ -55,23 +55,20 @@ namespace DBoW2
 #include "FeatureVector.h"
 #include "QueryResults.h"
 #include "FBrief.h"
-#include "FORB.h"
 
-/// ORB Vocabulary
-typedef DBoW2::TemplatedVocabulary<DBoW2::FORB::TDescriptor, DBoW2::FORB> 
-  OrbVocabulary;
+#include "FOrb.h"
 
-/// FORB Database
-typedef DBoW2::TemplatedDatabase<DBoW2::FORB::TDescriptor, DBoW2::FORB> 
-  OrbDatabase;
+/// Orb Vocabulary
+typedef DBoW2::TemplatedVocabulary<DBoW2::FOrb::TDescriptor, DBoW2::FOrb> OrbVocabulary;
+
+/// FOrb Database
+typedef DBoW2::TemplatedDatabase<DBoW2::FOrb::TDescriptor, DBoW2::FOrb> OrbDatabase;
   
 /// BRIEF Vocabulary
-typedef DBoW2::TemplatedVocabulary<DBoW2::FBrief::TDescriptor, DBoW2::FBrief> 
-  BriefVocabulary;
+typedef DBoW2::TemplatedVocabulary<DBoW2::FBrief::TDescriptor, DBoW2::FBrief> BriefVocabulary;
 
 /// BRIEF Database
-typedef DBoW2::TemplatedDatabase<DBoW2::FBrief::TDescriptor, DBoW2::FBrief> 
-  BriefDatabase;
+typedef DBoW2::TemplatedDatabase<DBoW2::FBrief::TDescriptor, DBoW2::FBrief> BriefDatabase;
 
 #endif
 
