@@ -57,12 +57,19 @@ namespace DBoW2
 #include "FBrief.h"
 
 #include "FOrb.h"
+#include "FAkaze61.h"
 
 /// Orb Vocabulary
 typedef DBoW2::TemplatedVocabulary<DBoW2::FOrb::TDescriptor, DBoW2::FOrb> OrbVocabulary;
 
 /// FOrb Database
 typedef DBoW2::TemplatedDatabase<DBoW2::FOrb::TDescriptor, DBoW2::FOrb> OrbDatabase;
+
+/// Akaze61 Vocabulary
+typedef DBoW2::TemplatedVocabulary<DBoW2::FAkaze61::TDescriptor, DBoW2::FAkaze61> Akaze61Vocabulary;
+
+/// FAkaze61 Database
+typedef DBoW2::TemplatedDatabase<DBoW2::FAkaze61::TDescriptor, DBoW2::FAkaze61> Akaze61Database;
   
 /// BRIEF Vocabulary
 typedef DBoW2::TemplatedVocabulary<DBoW2::FBrief::TDescriptor, DBoW2::FBrief> BriefVocabulary;
