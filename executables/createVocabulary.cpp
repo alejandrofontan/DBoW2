@@ -12,8 +12,8 @@
 
 enum DescriptorType {
     DESC_ORB = 0,
-    /*DESC_AKAZE61 = 1,
-    DESC_BRISK = 2,
+    DESC_AKAZE61 = 1,
+    /*DESC_BRISK = 2,
     DESC_SURF64 = 3,
     DESC_KAZE64 = 4,*/
 };
@@ -127,7 +127,7 @@ void loadBinaryFeatures(vector<vector<DESCRIPTOR_BINARY_FORMAT>> &features, cons
                 changeStructure(descriptors, features.back());
             }
             break;
-        }
+        }*/
         case DESC_AKAZE61:
         {
             // Provide your detector
@@ -147,7 +147,7 @@ void loadBinaryFeatures(vector<vector<DESCRIPTOR_BINARY_FORMAT>> &features, cons
                 changeStructure(descriptors, features.back());
             }
             break;
-        }*/
+        }
         case DESC_ORB:
         {
             cv::Ptr<cv::ORB> orb = cv::ORB::create();
@@ -268,7 +268,7 @@ void testBinaryVocCreation(const vector<vector<DESCRIPTOR_BINARY_FORMAT>> &featu
             //voc.save(savePath + "/" + descriptorName + "_DBoW2_voc.yml.gz");
             voc.saveToTextFile(savePath + "/" + descriptorName + "_DBoW2_voc.txt");
             break;
-        }
+        }*/
         case DESC_AKAZE61:
         {
             Akaze61Vocabulary voc(k, L, weight, scoring);
@@ -279,7 +279,7 @@ void testBinaryVocCreation(const vector<vector<DESCRIPTOR_BINARY_FORMAT>> &featu
             //voc.save(savePath + "/" + descriptorName + "_DBoW2_voc.yml.gz");
             voc.saveToTextFile(savePath + "/" + descriptorName + "_DBoW2_voc.txt");
             break;
-        }*/
+        }
         case DESC_ORB:
         {
             OrbVocabulary voc(k, L, weight, scoring);
