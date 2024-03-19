@@ -1,15 +1,15 @@
 /**
- * File: FAkaze61.h
+ * File: FBrisk.h
  * Date: March 2024
  * Original Author: Dorian Galvez-Lopez
  * Modified by Alejandro Fontan Villacampa for AnyFeature-VSLAM
- * Description: functions for Akaze61 descriptors
+ * Description: functions for Brisk descriptors
  * License: see the LICENSE.txt file
  *
  */
 
-#ifndef __D_T_F_AKAZE61__
-#define __D_T_F_AKAZE61__
+#ifndef __D_T_F_BRISK__
+#define __D_T_F_BRISK__
 
 #include <opencv2/core.hpp>
 #include <vector>
@@ -19,8 +19,8 @@
 
 namespace DBoW2 {
 
-/// Functions to manipulate AKAZE61 descriptors
-class FAkaze61: protected FClass
+/// Functions to manipulate BRISK descriptors
+class FBrisk: protected FClass
 {
 public:
 
@@ -29,7 +29,7 @@ public:
   /// Pointer to a single descriptor
   typedef const TDescriptor *pDescriptor;
   /// Descriptor length (in bytes)
-  static const int L = 61;
+  static const int L = 64;
 
   /**
    * Calculates the mean value of a set of descriptors

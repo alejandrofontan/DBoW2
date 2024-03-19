@@ -1,7 +1,8 @@
-/**
+ /**
  * File: FSurf64.cpp
- * Date: November 2011
- * Author: Dorian Galvez-Lopez
+ * Date: March 2024
+ * Original Author: Dorian Galvez-Lopez
+ * Modified by Alejandro Fontan Villacampa for AnyFeature-VSLAM
  * Description: functions for Surf64 descriptors
  * License: see the LICENSE.txt file
  *

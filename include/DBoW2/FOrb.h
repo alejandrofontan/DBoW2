@@ -19,7 +19,7 @@
 
 namespace DBoW2 {
 
-/// Functions to manipulate BRIEF descriptors
+/// Functions to manipulate ORB descriptors
 class FOrb: protected FClass
 {
 public:

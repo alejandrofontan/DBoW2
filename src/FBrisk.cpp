@@ -1,9 +1,9 @@
 /**
- * File: FAkaze61.cpp
+ * File: FBrisk.cpp
  * Date: March 2024
  * Original Author: Dorian Galvez-Lopez
  * Modified by Alejandro Fontan Villacampa for AnyFeature-VSLAM
- * Description: functions for Akaze61 descriptors
+ * Description: functions for Brisk descriptors
  * License: see the LICENSE.txt file
  *
  */
@@ -14,7 +14,7 @@
 #include <stdint.h>
 #include <limits.h>
 
-#include "FAkaze61.h"
+#include "FBrisk.h"
 
 using namespace std;
 
@@ -22,8 +22,8 @@ namespace DBoW2 {
 
 // --------------------------------------------------------------------------
 
-void FAkaze61::meanValue(const std::vector<FAkaze61::pDescriptor> &descriptors, 
-  FAkaze61::TDescriptor &mean)
+void FBrisk::meanValue(const std::vector<FBrisk::pDescriptor> &descriptors, 
+  FBrisk::TDescriptor &mean)
 {
   if(descriptors.empty())
   {
@@ -36,7 +36,7 @@ void FAkaze61::meanValue(const std::vector<FAkaze61::pDescriptor> &descriptors,
   }
   else
   {
-    vector<int> sum(FAkaze61::L * 8, 0);
+    vector<int> sum(FBrisk::L * 8, 0);
     
     for(size_t i = 0; i < descriptors.size(); ++i)
     {
@@ -56,7 +56,7 @@ void FAkaze61::meanValue(const std::vector<FAkaze61::pDescriptor> &descriptors,
       }
     }
     
-    mean = cv::Mat::zeros(1, FAkaze61::L, CV_8U);
+    mean = cv::Mat::zeros(1, FBrisk::L, CV_8U);
     unsigned char *p = mean.ptr<unsigned char>();
     
     const int N2 = (int)descriptors.size() / 2 + descriptors.size() % 2;
@@ -75,8 +75,8 @@ void FAkaze61::meanValue(const std::vector<FAkaze61::pDescriptor> &descriptors,
 
 // --------------------------------------------------------------------------
   
-double FAkaze61::distance(const FAkaze61::TDescriptor &a, 
-  const FAkaze61::TDescriptor &b)
+double FBrisk::distance(const FBrisk::TDescriptor &a, 
+  const FBrisk::TDescriptor &b)
 {
   // Bit count function got from:
   // http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetKernighan
@@ -103,7 +103,7 @@ double FAkaze61::distance(const FAkaze61::TDescriptor &a,
 
 // --------------------------------------------------------------------------
   
-std::string FAkaze61::toString(const FAkaze61::TDescriptor &a)
+std::string FBrisk::toString(const FBrisk::TDescriptor &a)
 {
   stringstream ss;
   const unsigned char *p = a.ptr<unsigned char>();
@@ -118,13 +118,13 @@ std::string FAkaze61::toString(const FAkaze61::TDescriptor &a)
 
 // --------------------------------------------------------------------------
   
-void FAkaze61::fromString(FAkaze61::TDescriptor &a, const std::string &s)
+void FBrisk::fromString(FBrisk::TDescriptor &a, const std::string &s)
 {
-  a.create(1, FAkaze61::L, CV_8U);
+  a.create(1, FBrisk::L, CV_8U);
   unsigned char *p = a.ptr<unsigned char>();
   
   stringstream ss(s);
-  for(int i = 0; i < FAkaze61::L; ++i, ++p)
+  for(int i = 0; i < FBrisk::L; ++i, ++p)
   {
     int n;
     ss >> n;
@@ -137,7 +137,7 @@ void FAkaze61::fromString(FAkaze61::TDescriptor &a, const std::string &s)
 
 // --------------------------------------------------------------------------
 
-void FAkaze61::toMat32F(const std::vector<TDescriptor> &descriptors, 
+void FBrisk::toMat32F(const std::vector<TDescriptor> &descriptors, 
   cv::Mat &mat)
 {
   if(descriptors.empty())
@@ -148,7 +148,7 @@ void FAkaze61::toMat32F(const std::vector<TDescriptor> &descriptors,
   
   const size_t N = descriptors.size();
   
-  mat.create(N, FAkaze61::L*8, CV_32F);
+  mat.create(N, FBrisk::L*8, CV_32F);
   float *p = mat.ptr<float>();
   
   for(size_t i = 0; i < N; ++i)
@@ -172,24 +172,24 @@ void FAkaze61::toMat32F(const std::vector<TDescriptor> &descriptors,
 
 // --------------------------------------------------------------------------
 
-void FAkaze61::toMat32F(const cv::Mat &descriptors, cv::Mat &mat)
+void FBrisk::toMat32F(const cv::Mat &descriptors, cv::Mat &mat)
 {
   descriptors.convertTo(mat, CV_32F);
 }
 
 // --------------------------------------------------------------------------
 
-void FAkaze61::toMat8U(const std::vector<TDescriptor> &descriptors, 
+void FBrisk::toMat8U(const std::vector<TDescriptor> &descriptors, 
   cv::Mat &mat)
 {
-  mat.create(descriptors.size(), FAkaze61::L, CV_8U);
+  mat.create(descriptors.size(), FBrisk::L, CV_8U);
   
   unsigned char *p = mat.ptr<unsigned char>();
   
-  for(size_t i = 0; i < descriptors.size(); ++i, p += FAkaze61::L)
+  for(size_t i = 0; i < descriptors.size(); ++i, p += FBrisk::L)
   {
     const unsigned char *d = descriptors[i].ptr<unsigned char>();
-    std::copy(d, d + FAkaze61::L, p);
+    std::copy(d, d + FBrisk::L, p);
   }
   
 }

@@ -11,10 +11,12 @@
 #define DESCRIPTOR_NON_BINARY_FORMAT std::vector<float>
 
 enum DescriptorType {
-    DESC_ORB = 0,
-    DESC_AKAZE61 = 1,
-    /*DESC_BRISK = 2,
     DESC_SURF64 = 3,
+    DESC_BRISK = 2,
+    DESC_AKAZE61 = 1,
+    DESC_ORB = 0
+
+    /*DESC_SUSRFJ64 = 3,
     DESC_KAZE64 = 4,*/
 };
 
@@ -57,6 +59,7 @@ int k = 9; // branching factor
 int L = 3; // depth levels
 const WeightingType weight = TF_IDF;
 const ScoringType scoring = L1_NORM;
+const string script_label = "[createVocabulary.cpp] ";
 
 // ----------------------------------------------------------------------------
 int main(int argc,char **argv){
@@ -82,7 +85,7 @@ int main(int argc,char **argv){
         imagePaths.push_back(imagesTxt[imageId][0]);
 
     numberOfImages = imagePaths.size();
-    cout << "[createVocabulary] Number Of Images = " << numberOfImages << endl;
+    cout << script_label + "Number Of Images = " << numberOfImages << endl;
 
     if(isBinary){
         vector<vector<DESCRIPTOR_BINARY_FORMAT>> features;
@@ -108,28 +111,24 @@ void loadBinaryFeatures(vector<vector<DESCRIPTOR_BINARY_FORMAT>> &features, cons
     const int progressBarWidth = 50; // Width of the progress bar in characters
     const int totalIterations = numberOfImages; // Total iterations for the process
 
-    cout << "[createVocabulary] Extracting " + descriptorName + " features..." << endl;
+    cout << script_label + "Extracting " + descriptorName + " features..." << endl;
     switch(descriptorId) { // loadBinaryFeatures
-        /*case DESC_BRISK:
-        {
-            // Provide your detector
+        case DESC_BRISK:{          
             cv::Ptr<cv::BRISK> brisk = cv::BRISK::create();
-            brisk->setOctaves(3);
-            for(int i = 0; i < numberOfImages; ++i){
-                double progress = (double)i / totalIterations;
+            for(int iRGB = 0; iRGB < numberOfImages; ++iRGB){
+                double progress = (double)iRGB / totalIterations;
                 displayProgressBar(progressBarWidth, progress);
-            	vector<cv::KeyPoint> keypoints;
-            	cv::Mat descriptors;
-            	cv::Mat image = cv::imread(imagePaths[i], 0);
-            	cv::Mat mask{};
+                vector<cv::KeyPoint> keypoints;
+                cv::Mat descriptors;
+                cv::Mat image = cv::imread(imagePaths[iRGB], 0);
+                cv::Mat mask{};
                 brisk->detectAndCompute(image, mask, keypoints, descriptors);
-                features.push_back(vector<DESCRIPTOR_BINARY_FORMAT>());
+                features.push_back(vector<cv::Mat>());
                 changeStructure(descriptors, features.back());
             }
-            break;
-        }*/
-        case DESC_AKAZE61:
-        {
+            break;          
+        }      
+        case DESC_AKAZE61: {
             // Provide your detector
             cv::Ptr<cv::AKAZE> akaze61 = cv::AKAZE::create();
             akaze61->setNOctaves(4);
@@ -148,8 +147,7 @@ void loadBinaryFeatures(vector<vector<DESCRIPTOR_BINARY_FORMAT>> &features, cons
             }
             break;
         }
-        case DESC_ORB:
-        {
+        case DESC_ORB: {
             cv::Ptr<cv::ORB> orb = cv::ORB::create();
             orb->setNLevels(8);
             orb->setScaleFactor(1.2f);
@@ -183,14 +181,29 @@ void loadNonBinaryFeatures(vector<vector<DESCRIPTOR_NON_BINARY_FORMAT>> &feature
     const int progressBarWidth = 50; // Width of the progress bar in characters
     const int totalIterations = numberOfImages; // Total iterations for the process
 
-    cout << "[createVocabulary] Extracting " + descriptorName + " features..." << endl;
+    cout << script_label + "Extracting " + descriptorName + " features..." << endl;
     switch(descriptorId) { // loadNonBinaryFeatures
-        /*case DESC_KAZE64:
+        case DESC_SURF64:{
+            cv::Ptr<cv::xfeatures2d::SURF> surf64 = cv::xfeatures2d::SURF::create();
+            for(int iRGB = 0; iRGB < numberOfImages; ++iRGB){
+                double progress = (double)iRGB / totalIterations;
+                displayProgressBar(progressBarWidth, progress);
+                vector<cv::KeyPoint> keypoints;
+                cv::Mat descriptors;
+                cv::Mat image = cv::imread(imagePaths[iRGB], 0);
+                cv::Mat mask{};
+                surf64->detectAndCompute(image, mask, keypoints, descriptors);
+                features.push_back(vector<vector<float>>());
+                changeStructure(descriptors, features.back());
+            }
+            break;   
+        }
+        /*case DESC_KAZaE64:
         {
             // Provide your detector
-            cv::Ptr<cv::KAZE> kaze64 = cv::KAZE::create();
-            kaze64->setNOctaves(4);
-            kaze64->setNOctaveLayers(4);
+            cv::Ptr<cv::KAZaE> kazea64 = cv::KAaZE::create();
+            kaze6a4->setNOctaves(4);
+            kazea64->setNOctaveLayers(4);
             for(int i = 0; i < numberOfImages; ++i){
                 double progress = (double)i / totalIterations;
                 displayProgressBar(progressBarWidth, progress);
@@ -198,31 +211,13 @@ void loadNonBinaryFeatures(vector<vector<DESCRIPTOR_NON_BINARY_FORMAT>> &feature
             	cv::Mat descriptors;
             	cv::Mat image = cv::imread(imagePaths[i], 0);
             	cv::Mat mask{};
-  	            kaze64->detectAndCompute(image, mask, keypoints, descriptors);
+  	            kaze6a4->detectAndCompute(image, mask, keypoints, descriptors);
                 features.push_back(vector<DESCRIPTOR_NON_BINARY_FORMAT>());
                 changeStructure(descriptors, features.back());
             }
             break;
         }
-        case DESC_SURF64:
-        {
-            // Provide your detector
-            cv::Ptr<cv::xfeatures2d::SURF> surf64 = cv::xfeatures2d::SURF::create();
-            surf64->setNOctaves(4);
-            surf64->setNOctaveLayers(3);
-            for(int i = 0; i < numberOfImages; ++i){
-                double progress = (double)i / totalIterations;
-                displayProgressBar(progressBarWidth, progress);
-            	vector<cv::KeyPoint> keypoints;
-            	cv::Mat descriptors;
-            	cv::Mat image = cv::imread(imagePaths[i], 0);
-            	cv::Mat mask{};
-                surf64->detectAndCompute(image, mask, keypoints, descriptors);
-                features.push_back(vector<DESCRIPTOR_NON_BINARY_FORMAT>());
-                changeStructure(descriptors, features.back());
-            }
-            break;
-        }*/
+        */
     }
     std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
 
@@ -255,25 +250,23 @@ void changeStructure(const cv::Mat &plain, vector<DESCRIPTOR_NON_BINARY_FORMAT> 
 void testBinaryVocCreation(const vector<vector<DESCRIPTOR_BINARY_FORMAT>> &features){
     std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 
-    cout << "[createVocabulary] Creating a " << k << "^" << L << " vocabulary..." << endl;
+    cout << script_label + "Creating a " << k << "^" << L << " vocabulary..." << endl;
 
-    switch (descriptorId) { // create binary vocabulary
-        /*case DESC_BRISK:
-        {
+    switch (descriptorId) { // create binary vocabulary      
+        case DESC_BRISK:{
             BriskVocabulary voc(k, L, weight, scoring);
             voc.create(features);
-            cout << "[createVocabulary] Vocabulary information: " << endl
+            cout << script_label + "Vocabulary information: " << endl
                  << voc << endl << endl;
             cout << endl << "Saving vocabulary..." << endl;
-            //voc.save(savePath + "/" + descriptorName + "_DBoW2_voc.yml.gz");
-            voc.saveToTextFile(savePath + "/" + descriptorName + "_DBoW2_voc.txt");
+            voc.saveToTextFile(savePath + "/Brisk_DBoW2_voc.txt");
             break;
-        }*/
+        }
         case DESC_AKAZE61:
         {
             Akaze61Vocabulary voc(k, L, weight, scoring);
             voc.create(features);
-            cout << "[createVocabulary] Vocabulary information: " << endl
+            cout << script_label + "Vocabulary information: " << endl
                  << voc << endl << endl;
             cout << endl << "Saving vocabulary..." << endl;
             //voc.save(savePath + "/" + descriptorName + "_DBoW2_voc.yml.gz");
@@ -284,7 +277,7 @@ void testBinaryVocCreation(const vector<vector<DESCRIPTOR_BINARY_FORMAT>> &featu
         {
             OrbVocabulary voc(k, L, weight, scoring);
             voc.create(features);
-            cout << "[createVocabulary] Vocabulary information: " << endl
+            cout << script_label + "Vocabulary information: " << endl
                  << voc << endl << endl;
             cout << endl << "Saving vocabulary..." << endl;
             //voc.save(savePath + "/" + descriptorName + "_DBoW2_voc.yml.gz");
@@ -301,12 +294,21 @@ void testBinaryVocCreation(const vector<vector<DESCRIPTOR_BINARY_FORMAT>> &featu
 void testNonBinaryVocCreation(const vector<vector<DESCRIPTOR_NON_BINARY_FORMAT>> &features){
     std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 
-    cout << "[createVocabulary] Creating a " << k << "^" << L << " "<< descriptorName << " vocabulary..." << endl;
+    cout << script_label + "Creating a " << k << "^" << L << " "<< descriptorName << " vocabulary..." << endl;
 
     switch (descriptorId) { // create  non binary vocabulary
-        /*case DESC_KAZE64:
+        case DESC_SURF64:{
+            Surf64Vocabulary voc(k, L, weight, scoring);
+            voc.create(features);
+            cout << script_label + "Vocabulary information: " << endl
+                 << voc << endl << endl;
+            cout << endl << "Saving vocabulary..." << endl;
+            voc.saveToTextFile(savePath + "/Surf64_DBoW2_voc.txt");
+            break;
+        }
+        /*case DESC_KAaZE64:
         {
-            Kaze64Vocabulary voc(k, L, weight, scoring);
+            Kazea64Vocabulary voc(k, L, weight, scoring);
             voc.create(features);
             cout << "[createVocabulary] Vocabulary information: " << endl
                  << voc << endl << endl;
@@ -315,9 +317,9 @@ void testNonBinaryVocCreation(const vector<vector<DESCRIPTOR_NON_BINARY_FORMAT>>
             voc.saveToTextFile(savePath + "/" + descriptorName + "_DBoW2_voc.txt");
             break;
         }
-        case DESC_SURF64:
+        case DESC_SURaF64:
         {
-            Surf64Vocabulary voc(k, L, weight, scoring);
+            Suraf64Vocabulary voc(k, L, weight, scoring);
             voc.create(features);
             cout << "[createVocabulary] Vocabulary information: " << endl
                  << voc << endl << endl;

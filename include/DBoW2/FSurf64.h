@@ -1,12 +1,13 @@
 /**
  * File: FSurf64.h
- * Date: November 2011
- * Author: Dorian Galvez-Lopez
+ * Date: March 2024
+ * Original Author: Dorian Galvez-Lopez
+ * Modified by Alejandro Fontan Villacampa for AnyFeature-VSLAM
  * Description: functions for Surf64 descriptors
  * License: see the LICENSE.txt file
  *
  */
- 
+  
 #ifndef __D_T_F_SURF_64__
 #define __D_T_F_SURF_64__
 
@@ -27,9 +28,9 @@ public:
   typedef std::vector<float> TDescriptor;
   /// Pointer to a single descriptor
   typedef const TDescriptor *pDescriptor;
-  /// Descriptor length
-  static const int L = 64; 
-
+  /// Descriptor length (number of floats)
+  static const int L = 64;
+  
   /**
    * Returns the number of dimensions of the descriptor space
    * @return dimensions

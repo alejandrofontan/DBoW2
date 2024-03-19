@@ -57,7 +57,23 @@ namespace DBoW2
 #include "FBrief.h"
 
 #include "FOrb.h"
+#include "FSurf64.h"
+#include "FBrisk.h"
 #include "FAkaze61.h"
+
+// Vocabulary Templates
+
+/// Surf64 Vocabulary
+typedef DBoW2::TemplatedVocabulary<DBoW2::FSurf64::TDescriptor, DBoW2::FSurf64> Surf64Vocabulary;
+
+/// FSurf64 Database
+typedef DBoW2::TemplatedDatabase<DBoW2::FSurf64::TDescriptor, DBoW2::FSurf64> Surf64Database;
+
+/// Brisk Vocabulary
+typedef DBoW2::TemplatedVocabulary<DBoW2::FBrisk::TDescriptor, DBoW2::FBrisk> BriskVocabulary;
+
+/// FBrisk Database
+typedef DBoW2::TemplatedDatabase<DBoW2::FBrisk::TDescriptor, DBoW2::FBrisk> BriskDatabase;
 
 /// Orb Vocabulary
 typedef DBoW2::TemplatedVocabulary<DBoW2::FOrb::TDescriptor, DBoW2::FOrb> OrbVocabulary;
