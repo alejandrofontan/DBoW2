@@ -14,6 +14,7 @@ set(HDRS_DBOW2
   include/DBoW2/DBoW2.h               include/DBoW2/FClass.h              include/DBoW2/FeatureVector.h
   include/DBoW2/ScoringObject.h       include/DBoW2/TemplatedVocabulary.h
   include/DBoW2/FOrb.h
+  include/DBoW2/FKaze64.h
   include/DBoW2/FSurf64.h
   include/DBoW2/FBrisk.h
   include/DBoW2/FAkaze61.h
@@ -23,6 +24,7 @@ set(SRCS_DBOW2
   src/BowVector.cpp     src/FBrief.cpp        
   src/FeatureVector.cpp src/QueryResults.cpp  src/ScoringObject.cpp
   src/FOrb.cpp
+  src/FKaze64.cpp
   src/FSurf64.cpp
   src/FBrisk.cpp
   src/FAkaze61.cpp

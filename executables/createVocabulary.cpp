@@ -11,13 +11,11 @@
 #define DESCRIPTOR_NON_BINARY_FORMAT std::vector<float>
 
 enum DescriptorType {
+    DESC_KAZE64 = 4,
     DESC_SURF64 = 3,
     DESC_BRISK = 2,
     DESC_AKAZE61 = 1,
     DESC_ORB = 0
-
-    /*DESC_SUSRFJ64 = 3,
-    DESC_KAZE64 = 4,*/
 };
 
 #include <iostream>
@@ -183,6 +181,21 @@ void loadNonBinaryFeatures(vector<vector<DESCRIPTOR_NON_BINARY_FORMAT>> &feature
 
     cout << script_label + "Extracting " + descriptorName + " features..." << endl;
     switch(descriptorId) { // loadNonBinaryFeatures
+        case DESC_KAZE64:{
+            cv::Ptr<cv::KAZE> kaze64 = cv::KAZE::create();
+            for(int iRGB = 0; iRGB < numberOfImages; ++iRGB){
+                double progress = (double)iRGB / totalIterations;
+                displayProgressBar(progressBarWidth, progress);
+                vector<cv::KeyPoint> keypoints;
+                cv::Mat descriptors;
+                cv::Mat image = cv::imread(imagePaths[iRGB], 0);
+                cv::Mat mask{};
+                kaze64->detectAndCompute(image, mask, keypoints, descriptors);
+                features.push_back(vector<vector<float>>());
+                changeStructure(descriptors, features.back());
+            }
+            break;
+        }
         case DESC_SURF64:{
             cv::Ptr<cv::xfeatures2d::SURF> surf64 = cv::xfeatures2d::SURF::create();
             for(int iRGB = 0; iRGB < numberOfImages; ++iRGB){
@@ -198,26 +211,6 @@ void loadNonBinaryFeatures(vector<vector<DESCRIPTOR_NON_BINARY_FORMAT>> &feature
             }
             break;   
         }
-        /*case DESC_KAZaE64:
-        {
-            // Provide your detector
-            cv::Ptr<cv::KAZaE> kazea64 = cv::KAaZE::create();
-            kaze6a4->setNOctaves(4);
-            kazea64->setNOctaveLayers(4);
-            for(int i = 0; i < numberOfImages; ++i){
-                double progress = (double)i / totalIterations;
-                displayProgressBar(progressBarWidth, progress);
-            	vector<cv::KeyPoint> keypoints;
-            	cv::Mat descriptors;
-            	cv::Mat image = cv::imread(imagePaths[i], 0);
-            	cv::Mat mask{};
-  	            kaze6a4->detectAndCompute(image, mask, keypoints, descriptors);
-                features.push_back(vector<DESCRIPTOR_NON_BINARY_FORMAT>());
-                changeStructure(descriptors, features.back());
-            }
-            break;
-        }
-        */
     }
     std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
 
@@ -297,6 +290,15 @@ void testNonBinaryVocCreation(const vector<vector<DESCRIPTOR_NON_BINARY_FORMAT>>
     cout << script_label + "Creating a " << k << "^" << L << " "<< descriptorName << " vocabulary..." << endl;
 
     switch (descriptorId) { // create  non binary vocabulary
+        case DESC_KAZE64:{
+            Kaze64Vocabulary voc(k, L, weight, scoring);
+            voc.create(features);
+            cout << script_label + "Vocabulary information: " << endl
+                 << voc << endl << endl;
+            cout << endl << "Saving vocabulary..." << endl;
+            voc.saveToTextFile(savePath + "/Kaze64_DBoW2_voc.txt");
+            break;
+        }
         case DESC_SURF64:{
             Surf64Vocabulary voc(k, L, weight, scoring);
             voc.create(features);

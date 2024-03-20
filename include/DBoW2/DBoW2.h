@@ -57,11 +57,18 @@ namespace DBoW2
 #include "FBrief.h"
 
 #include "FOrb.h"
+#include "FKaze64.h"
 #include "FSurf64.h"
 #include "FBrisk.h"
 #include "FAkaze61.h"
 
 // Vocabulary Templates
+
+/// Kaze64 Vocabulary
+typedef DBoW2::TemplatedVocabulary<DBoW2::FKaze64::TDescriptor, DBoW2::FKaze64> Kaze64Vocabulary;
+
+/// FKaze64 Database
+typedef DBoW2::TemplatedDatabase<DBoW2::FKaze64::TDescriptor, DBoW2::FKaze64> Kaze64Database;
 
 /// Surf64 Vocabulary
 typedef DBoW2::TemplatedVocabulary<DBoW2::FSurf64::TDescriptor, DBoW2::FSurf64> Surf64Vocabulary;
