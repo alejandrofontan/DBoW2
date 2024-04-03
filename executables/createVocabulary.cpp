@@ -7,9 +7,6 @@
  * License: see the LICENSE.txt file
  */
 
-#define DESCRIPTOR_BINARY_FORMAT cv::Mat
-#define DESCRIPTOR_NON_BINARY_FORMAT std::vector<float>
-
 enum DescriptorType {
     DESC_KAZE64 = 4,
     DESC_SURF64 = 3,
@@ -39,13 +36,16 @@ using namespace std;
 std::vector<std::vector<std::string>> read_txt(const std::string &filePath, const size_t &numCols, char delimiter ,int headerRows);
 void displayProgressBar(int width, double progressPercentage);
 
-void loadBinaryFeatures(vector<vector<DESCRIPTOR_BINARY_FORMAT>> &features, const std::vector<std::string>& imagePaths);
-void changeStructure(const cv::Mat &plain, vector<DESCRIPTOR_BINARY_FORMAT> &out);
-void testBinaryVocCreation(const vector<vector<DESCRIPTOR_BINARY_FORMAT>> &features);
+void loadBinaryFeatures(vector<vector<cv::Mat>> &features, const std::vector<std::string>& imagePaths);
+void changeStructure(const cv::Mat &plain, vector<cv::Mat> &out);
+void testBinaryVocCreation(const vector<vector<cv::Mat>> &features);
 
-void loadNonBinaryFeatures(vector<vector<DESCRIPTOR_NON_BINARY_FORMAT>> &features, const std::vector<std::string>& imagePaths);
-void changeStructure(const cv::Mat &plain, vector<DESCRIPTOR_NON_BINARY_FORMAT> &out);
-void testNonBinaryVocCreation(const vector<vector<DESCRIPTOR_NON_BINARY_FORMAT>> &features);
+template <typename T>
+void loadNonBinaryFeatures(vector<vector<T>> &features, const std::vector<std::string>& imagePaths);
+template <typename T>
+void changeStructure(const cv::Mat &plain, vector<T> &out);
+template <typename T>
+void testNonBinaryVocCreation(const vector<vector<T>> &features);
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 int numberOfImages{};
@@ -86,12 +86,12 @@ int main(int argc,char **argv){
     cout << script_label + "Number Of Images = " << numberOfImages << endl;
 
     if(isBinary){
-        vector<vector<DESCRIPTOR_BINARY_FORMAT>> features;
+        vector<vector<cv::Mat>> features;
         loadBinaryFeatures(features,imagePaths);
         testBinaryVocCreation(features);
     }
     else{
-        vector<vector<DESCRIPTOR_NON_BINARY_FORMAT>> features;
+        vector<vector<vector<float>>> features;
         loadNonBinaryFeatures(features,imagePaths);
         testNonBinaryVocCreation(features);
     }
@@ -100,7 +100,7 @@ int main(int argc,char **argv){
 }
 
 // ----------------------------------------------------------------------------
-void loadBinaryFeatures(vector<vector<DESCRIPTOR_BINARY_FORMAT>> &features, const std::vector<std::string>& imagePaths)
+void loadBinaryFeatures(vector<vector<cv::Mat>> &features, const std::vector<std::string>& imagePaths)
 {
     std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
     features.clear();
@@ -140,7 +140,7 @@ void loadBinaryFeatures(vector<vector<DESCRIPTOR_BINARY_FORMAT>> &features, cons
             	cv::Mat image = cv::imread(imagePaths[i], 0);
             	cv::Mat mask{};
                 akaze61->detectAndCompute(image, mask, keypoints, descriptors);
-                features.push_back(vector<DESCRIPTOR_BINARY_FORMAT>());
+                features.push_back(vector<cv::Mat>());
                 changeStructure(descriptors, features.back());
             }
             break;
@@ -158,7 +158,7 @@ void loadBinaryFeatures(vector<vector<DESCRIPTOR_BINARY_FORMAT>> &features, cons
                 cv::Mat image = cv::imread(imagePaths[i], 0);
                 cv::Mat mask{};
                 orb->detectAndCompute(image, mask, keypoints, descriptors);
-                features.push_back(vector<DESCRIPTOR_BINARY_FORMAT>());
+                features.push_back(vector<cv::Mat>());
                 changeStructure(descriptors, features.back());
             }
             break;
@@ -170,7 +170,8 @@ void loadBinaryFeatures(vector<vector<DESCRIPTOR_BINARY_FORMAT>> &features, cons
     cout << "        finished (" + std::to_string(tduration) + " s). " << endl;
 }
 
-void loadNonBinaryFeatures(vector<vector<DESCRIPTOR_NON_BINARY_FORMAT>> &features, const std::vector<std::string>& imagePaths)
+template <typename T>
+void loadNonBinaryFeatures(vector<vector<T>> &features, const std::vector<std::string>& imagePaths)
 {
     std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
     features.clear();
@@ -219,7 +220,7 @@ void loadNonBinaryFeatures(vector<vector<DESCRIPTOR_NON_BINARY_FORMAT>> &feature
 }
 
 // ----------------------------------------------------------------------------
-void changeStructure(const cv::Mat &plain, vector<DESCRIPTOR_BINARY_FORMAT> &out)
+void changeStructure(const cv::Mat &plain, vector<cv::Mat> &out)
 {
   out.resize(plain.rows);
 
@@ -229,7 +230,8 @@ void changeStructure(const cv::Mat &plain, vector<DESCRIPTOR_BINARY_FORMAT> &out
   }
 }
 
-void changeStructure(const cv::Mat &plain, vector<DESCRIPTOR_NON_BINARY_FORMAT> &out)
+template <typename T>
+void changeStructure(const cv::Mat &plain, vector<T> &out)
 {
     out.resize(plain.rows);
 
@@ -240,7 +242,7 @@ void changeStructure(const cv::Mat &plain, vector<DESCRIPTOR_NON_BINARY_FORMAT> 
 }
 
 // ----------------------------------------------------------------------------
-void testBinaryVocCreation(const vector<vector<DESCRIPTOR_BINARY_FORMAT>> &features){
+void testBinaryVocCreation(const vector<vector<cv::Mat>> &features){
     std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 
     cout << script_label + "Creating a " << k << "^" << L << " vocabulary..." << endl;
@@ -284,7 +286,8 @@ void testBinaryVocCreation(const vector<vector<DESCRIPTOR_BINARY_FORMAT>> &featu
     cout << "        finished (" + std::to_string(tduration) + " s). " << endl;
 }
 
-void testNonBinaryVocCreation(const vector<vector<DESCRIPTOR_NON_BINARY_FORMAT>> &features){
+template <typename T>
+void testNonBinaryVocCreation(const vector<vector<T>> &features){
     std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 
     cout << script_label + "Creating a " << k << "^" << L << " "<< descriptorName << " vocabulary..." << endl;
@@ -308,28 +311,6 @@ void testNonBinaryVocCreation(const vector<vector<DESCRIPTOR_NON_BINARY_FORMAT>>
             voc.saveToTextFile(savePath + "/Surf64_DBoW2_voc.txt");
             break;
         }
-        /*case DESC_KAaZE64:
-        {
-            Kazea64Vocabulary voc(k, L, weight, scoring);
-            voc.create(features);
-            cout << "[createVocabulary] Vocabulary information: " << endl
-                 << voc << endl << endl;
-            cout << endl << "Saving vocabulary..." << endl;
-            //voc.save(savePath + "/" + descriptorName + "_DBoW2_voc.yml.gz");
-            voc.saveToTextFile(savePath + "/" + descriptorName + "_DBoW2_voc.txt");
-            break;
-        }
-        case DESC_SURaF64:
-        {
-            Suraf64Vocabulary voc(k, L, weight, scoring);
-            voc.create(features);
-            cout << "[createVocabulary] Vocabulary information: " << endl
-                 << voc << endl << endl;
-            cout << endl << "Saving vocabulary..." << endl;
-            //voc.save(savePath + "/" + descriptorName + "_DBoW2_voc.yml.gz");
-            voc.saveToTextFile(savePath + "/" + descriptorName + "_DBoW2_voc.txt");
-            break;
-        }*/
     }
 
     std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
