@@ -91,9 +91,20 @@ int main(int argc,char **argv){
         testBinaryVocCreation(features);
     }
     else{
-        vector<vector<vector<float>>> features;
-        loadNonBinaryFeatures(features,imagePaths);
-        testNonBinaryVocCreation(features);
+        switch(descriptorId) { // feature definition
+            case DESC_KAZE64:{
+                vector<vector<vector<float>>> features;
+                loadNonBinaryFeatures(features,imagePaths);
+                testNonBinaryVocCreation(features);
+                break;
+            }
+            case DESC_SURF64:{
+                vector<vector<vector<float>>> features;
+                loadNonBinaryFeatures(features,imagePaths);
+                testNonBinaryVocCreation(features);
+                break;
+            }
+
     }
 
     return 0;
