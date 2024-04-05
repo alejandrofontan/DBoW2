@@ -57,12 +57,26 @@ namespace DBoW2
 #include "FBrief.h"
 
 #include "FOrb.h"
+#include "FR2d2.h"
+#include "FSift128.h"
 #include "FKaze64.h"
 #include "FSurf64.h"
 #include "FBrisk.h"
 #include "FAkaze61.h"
 
 // Vocabulary Templates
+
+/// R2d2 Vocabulary
+typedef DBoW2::TemplatedVocabulary<DBoW2::FR2d2::TDescriptor, DBoW2::FR2d2> R2d2Vocabulary;
+
+/// FR2d2 Database
+typedef DBoW2::TemplatedDatabase<DBoW2::FR2d2::TDescriptor, DBoW2::FR2d2> R2d2Database;
+
+/// Sift128 Vocabulary
+typedef DBoW2::TemplatedVocabulary<DBoW2::FSift128::TDescriptor, DBoW2::FSift128> Sift128Vocabulary;
+
+/// FSift128 Database
+typedef DBoW2::TemplatedDatabase<DBoW2::FSift128::TDescriptor, DBoW2::FSift128> Sift128Database;
 
 /// Kaze64 Vocabulary
 typedef DBoW2::TemplatedVocabulary<DBoW2::FKaze64::TDescriptor, DBoW2::FKaze64> Kaze64Vocabulary;

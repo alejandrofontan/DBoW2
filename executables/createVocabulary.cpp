@@ -8,6 +8,8 @@
  */
 
 enum DescriptorType {
+    DESC_R2D2 = 6,
+    DESC_SIFT128 = 5,
     DESC_KAZE64 = 4,
     DESC_SURF64 = 3,
     DESC_BRISK = 2,
@@ -27,6 +29,8 @@ enum DescriptorType {
 #include <opencv2/features2d.hpp>
 #include <opencv2/xfeatures2d.hpp>
 
+#include "brisk/brisk.h"
+
 #include <fstream>
 
 using namespace DBoW2;
@@ -40,12 +44,12 @@ void loadBinaryFeatures(vector<vector<cv::Mat>> &features, const std::vector<std
 void changeStructure(const cv::Mat &plain, vector<cv::Mat> &out);
 void testBinaryVocCreation(const vector<vector<cv::Mat>> &features);
 
-template <typename T>
-void loadNonBinaryFeatures(vector<vector<T>> &features, const std::vector<std::string>& imagePaths);
-template <typename T>
-void changeStructure(const cv::Mat &plain, vector<T> &out);
-template <typename T>
-void testNonBinaryVocCreation(const vector<vector<T>> &features);
+void loadNonBinaryFeatures(vector<vector<vector<float>>> &features, const std::vector<std::string>& imagePaths);
+void changeStructure(const cv::Mat &plain, vector<vector<float>> &out);
+void testNonBinaryVocCreation(const vector<vector<vector<float>>> &features);
+
+std::vector<std::vector<float>> loadBinFile(const std::string& filename, const int& numFloats);
+std::string replaceAllOccurrences(std::string str, const std::string& from, const std::string& to);
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 int numberOfImages{};
@@ -79,7 +83,7 @@ int main(int argc,char **argv){
     // Load images
     std::vector<std::string> imagePaths;
     std::vector<std::vector<std::string>> imagesTxt = read_txt(rgbTxt,1,' ',0);
-    for(size_t imageId{0}; imageId < imagesTxt.size(); imageId = imageId + 6)
+    for(size_t imageId{0}; imageId < imagesTxt.size(); ++imageId)
         imagePaths.push_back(imagesTxt[imageId][0]);
 
     numberOfImages = imagePaths.size();
@@ -91,20 +95,9 @@ int main(int argc,char **argv){
         testBinaryVocCreation(features);
     }
     else{
-        switch(descriptorId) { // feature definition
-            case DESC_KAZE64:{
-                vector<vector<vector<float>>> features;
-                loadNonBinaryFeatures(features,imagePaths);
-                testNonBinaryVocCreation(features);
-                break;
-            }
-            case DESC_SURF64:{
-                vector<vector<vector<float>>> features;
-                loadNonBinaryFeatures(features,imagePaths);
-                testNonBinaryVocCreation(features);
-                break;
-            }
-
+        vector<vector<vector<float>>> features;
+        loadNonBinaryFeatures(features,imagePaths);
+        testNonBinaryVocCreation(features);
     }
 
     return 0;
@@ -122,8 +115,15 @@ void loadBinaryFeatures(vector<vector<cv::Mat>> &features, const std::vector<std
 
     cout << script_label + "Extracting " + descriptorName + " features..." << endl;
     switch(descriptorId) { // loadBinaryFeatures
-        case DESC_BRISK:{          
-            cv::Ptr<cv::BRISK> brisk = cv::BRISK::create();
+        case DESC_BRISK:{
+            int octaves = 4;
+            bool suppressScaleNonmaxima = true;
+            bool rotationInvariant = true;
+            bool scaleInvariant = true;
+            cv::Ptr <cv::FeatureDetector> brisk_det = new brisk::BriskFeatureDetector(34.0f, octaves, suppressScaleNonmaxima);
+            cv::Ptr < cv::DescriptorExtractor > brisk_ext = new brisk::BriskDescriptorExtractor(
+                    rotationInvariant, scaleInvariant, brisk::BriskDescriptorExtractor::Version::briskV2);
+
             for(int iRGB = 0; iRGB < numberOfImages; ++iRGB){
                 double progress = (double)iRGB / totalIterations;
                 displayProgressBar(progressBarWidth, progress);
@@ -131,7 +131,11 @@ void loadBinaryFeatures(vector<vector<cv::Mat>> &features, const std::vector<std
                 cv::Mat descriptors;
                 cv::Mat image = cv::imread(imagePaths[iRGB], 0);
                 cv::Mat mask{};
-                brisk->detectAndCompute(image, mask, keypoints, descriptors);
+
+                brisk_det->detect(image, keypoints);
+
+                brisk_ext->compute(image, keypoints, descriptors);
+                std::cout << keypoints.size() << " " << descriptors.size() << std::endl;
                 features.push_back(vector<cv::Mat>());
                 changeStructure(descriptors, features.back());
             }
@@ -181,8 +185,7 @@ void loadBinaryFeatures(vector<vector<cv::Mat>> &features, const std::vector<std
     cout << "        finished (" + std::to_string(tduration) + " s). " << endl;
 }
 
-template <typename T>
-void loadNonBinaryFeatures(vector<vector<T>> &features, const std::vector<std::string>& imagePaths)
+void loadNonBinaryFeatures(vector<vector<vector<float>>> &features, const std::vector<std::string>& imagePaths)
 {
     std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
     features.clear();
@@ -190,9 +193,56 @@ void loadNonBinaryFeatures(vector<vector<T>> &features, const std::vector<std::s
 
     const int progressBarWidth = 50; // Width of the progress bar in characters
     const int totalIterations = numberOfImages; // Total iterations for the process
-
     cout << script_label + "Extracting " + descriptorName + " features..." << endl;
     switch(descriptorId) { // loadNonBinaryFeatures
+        case DESC_R2D2:{
+            for(int iRGB = 0; iRGB < numberOfImages; ++iRGB){
+                double progress = (double)iRGB / totalIterations;
+                displayProgressBar(progressBarWidth, progress);
+                vector<cv::KeyPoint> keypoints;
+                cv::Mat descriptors;
+
+                std::string keypoints_path = replaceAllOccurrences(imagePaths[iRGB], "rgb", "r2d2/keypoints");
+                keypoints_path = replaceAllOccurrences(keypoints_path, "png", "bin");
+                std::string scores_path = replaceAllOccurrences(imagePaths[iRGB], "rgb", "r2d2/scores");
+                scores_path = replaceAllOccurrences(scores_path, "png", "bin");
+                std::vector<std::vector<float>> keypointFloats = loadBinFile(keypoints_path,3);
+                std::vector<std::vector<float>> scoreFloats = loadBinFile(scores_path,1);
+                for(int iKeyPt{0}; iKeyPt < keypointFloats.size(); iKeyPt++){
+                    std::vector<float> lineScores    =  scoreFloats[iKeyPt];
+                    std::vector<float> lineKeypoints =  keypointFloats[iKeyPt];
+                    float response = float(lineScores[0]);
+                    cv::KeyPoint keyPt{};
+                    keyPt.pt.x = float(lineKeypoints[0]);
+                    keyPt.pt.y = float(lineKeypoints[1]);
+                    keyPt.size = float(lineKeypoints[2]);
+                    keyPt.response = response;
+                    keyPt.class_id = iKeyPt;
+                    keyPt.angle = 0.0;
+                    keypoints.push_back(keyPt);
+                }
+                std::string descriptors_path = replaceAllOccurrences(imagePaths[iRGB], "rgb", "r2d2/descriptors");
+                descriptors_path = replaceAllOccurrences(descriptors_path, "png", "bin");
+                std::vector<std::vector<float>> descriptorFloats = loadBinFile(descriptors_path,128);
+                features.push_back(descriptorFloats);
+            }
+            break;
+        }
+        case DESC_SIFT128:{
+            cv::Ptr<cv::SIFT> sift128 = cv::SIFT::create();
+            for(int iRGB = 0; iRGB < numberOfImages; ++iRGB){
+                double progress = (double)iRGB / totalIterations;
+                displayProgressBar(progressBarWidth, progress);
+                vector<cv::KeyPoint> keypoints;
+                cv::Mat descriptors;
+                cv::Mat image = cv::imread(imagePaths[iRGB], 0);
+                cv::Mat mask{};
+                sift128->detectAndCompute(image, mask, keypoints, descriptors);
+                features.push_back(vector<vector<float>>());
+                changeStructure(descriptors, features.back());
+            }
+            break;
+        }
         case DESC_KAZE64:{
             cv::Ptr<cv::KAZE> kaze64 = cv::KAZE::create();
             for(int iRGB = 0; iRGB < numberOfImages; ++iRGB){
@@ -241,8 +291,7 @@ void changeStructure(const cv::Mat &plain, vector<cv::Mat> &out)
   }
 }
 
-template <typename T>
-void changeStructure(const cv::Mat &plain, vector<T> &out)
+void changeStructure(const cv::Mat &plain, vector<vector<float>> &out)
 {
     out.resize(plain.rows);
 
@@ -260,7 +309,9 @@ void testBinaryVocCreation(const vector<vector<cv::Mat>> &features){
 
     switch (descriptorId) { // create binary vocabulary      
         case DESC_BRISK:{
+            cout << "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa 1"<<endl;
             BriskVocabulary voc(k, L, weight, scoring);
+            cout << "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa 2"<<endl;
             voc.create(features);
             cout << script_label + "Vocabulary information: " << endl
                  << voc << endl << endl;
@@ -297,13 +348,30 @@ void testBinaryVocCreation(const vector<vector<cv::Mat>> &features){
     cout << "        finished (" + std::to_string(tduration) + " s). " << endl;
 }
 
-template <typename T>
-void testNonBinaryVocCreation(const vector<vector<T>> &features){
+void testNonBinaryVocCreation(const vector<vector<vector<float>>> &features){
     std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 
     cout << script_label + "Creating a " << k << "^" << L << " "<< descriptorName << " vocabulary..." << endl;
 
     switch (descriptorId) { // create  non binary vocabulary
+        case DESC_R2D2:{
+            R2d2Vocabulary voc(k, L, weight, scoring);
+            voc.create(features);
+            cout << script_label + "Vocabulary information: " << endl
+                 << voc << endl << endl;
+            cout << endl << "Saving vocabulary..." << endl;
+            voc.saveToTextFile(savePath + "/R2d2_DBoW2_voc.txt");
+            break;
+        }
+        case DESC_SIFT128:{
+            Sift128Vocabulary voc(k, L, weight, scoring);
+            voc.create(features);
+            cout << script_label + "Vocabulary information: " << endl
+                 << voc << endl << endl;
+            cout << endl << "Saving vocabulary..." << endl;
+            voc.saveToTextFile(savePath + "/Sift128_DBoW2_voc.txt");
+            break;
+        }
         case DESC_KAZE64:{
             Kaze64Vocabulary voc(k, L, weight, scoring);
             voc.create(features);
@@ -372,4 +440,29 @@ void displayProgressBar(int width, double progressPercentage) {
     }
     std::cout << "] " << int(progressPercentage * 100.0) << " %\r";
     std::cout.flush();
+}
+
+std::vector<std::vector<float>> loadBinFile(const std::string& filename, const int& numFloats ){
+
+    std::vector<std::vector<float>> floats{};
+    std::vector<double> floatsRow(numFloats);
+
+    std::ifstream binFile(filename, std::ios::binary);
+    while (binFile.read(reinterpret_cast<char*>(floatsRow.data()), numFloats * sizeof(double))) {
+        std::vector<float> floats_;
+        for (double f : floatsRow)
+            floats_.push_back(float(f));
+        floats.push_back(floats_);
+    }
+    binFile.close();
+    return floats;
+}
+
+std::string replaceAllOccurrences(std::string str, const std::string& from, const std::string& to) {
+    size_t startPos = 0;
+    while ((startPos = str.find(from, startPos)) != std::string::npos) {
+        str.replace(startPos, from.length(), to);
+        startPos += to.length(); // Handles case when 'to' is a substring of 'from'
+    }
+    return str;
 }

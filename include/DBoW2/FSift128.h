@@ -1,15 +1,15 @@
 /**
- * File: FBrisk.h
+ * File: FSift128.h
  * Date: March 2024
  * Original Author: Dorian Galvez-Lopez
  * Modified by Alejandro Fontan Villacampa for AnyFeature-VSLAM
- * Description: functions for Brisk descriptors
+ * Description: functions for Sift128 descriptors
  * License: see the LICENSE.txt file
  *
  */
-
-#ifndef __D_T_F_BRISK__
-#define __D_T_F_BRISK__
+  
+#ifndef __D_T_F_SIFT128__
+#define __D_T_F_SIFT128__
 
 #include <opencv2/core.hpp>
 #include <vector>
@@ -19,31 +19,40 @@
 
 namespace DBoW2 {
 
-/// Functions to manipulate BRISK descriptors
-class FBrisk: protected FClass
+/// Functions to manipulate SURF64 descriptors
+class FSift128: protected FClass
 {
 public:
 
   /// Descriptor type
-  typedef cv::Mat TDescriptor; 
+  typedef std::vector<float> TDescriptor;
   /// Pointer to a single descriptor
   typedef const TDescriptor *pDescriptor;
-  /// Descriptor length (in bytes)
-  static const int L = 48;
+  /// Descriptor length (number of floats)
+  static const int L = 128;
+  
+  /**
+   * Returns the number of dimensions of the descriptor space
+   * @return dimensions
+   */
+  inline static int dimensions()
+  {
+    return L;
+  }
 
   /**
    * Calculates the mean value of a set of descriptors
-   * @param descriptors
+   * @param descriptors vector of pointers to descriptors
    * @param mean mean descriptor
    */
   static void meanValue(const std::vector<pDescriptor> &descriptors, 
     TDescriptor &mean);
   
   /**
-   * Calculates the distance between two descriptors
+   * Calculates the (squared) distance between two descriptors
    * @param a
    * @param b
-   * @return distance
+   * @return (squared) distance
    */
   static double distance(const TDescriptor &a, const TDescriptor &b);
   
@@ -60,7 +69,7 @@ public:
    * @param s string version
    */
   static void fromString(TDescriptor &a, const std::string &s);
-  
+
   /**
    * Returns a mat with the descriptors in float format
    * @param descriptors
@@ -68,25 +77,9 @@ public:
    */
   static void toMat32F(const std::vector<TDescriptor> &descriptors, 
     cv::Mat &mat);
-  
-  /**
-   * Returns a mat with the descriptors in float format
-   * @param descriptors NxL CV_8U matrix
-   * @param mat (out) NxL 32F matrix
-   */
-  static void toMat32F(const cv::Mat &descriptors, cv::Mat &mat);
-
-  /**
-   * Returns a matrix with the descriptor in OpenCV format
-   * @param descriptors vector of N row descriptors
-   * @param mat (out) NxL CV_8U matrix
-   */
-  static void toMat8U(const std::vector<TDescriptor> &descriptors, 
-    cv::Mat &mat);
 
 };
 
 } // namespace DBoW2
 
 #endif
-
