@@ -116,10 +116,10 @@ void loadBinaryFeatures(vector<vector<cv::Mat>> &features, const std::vector<std
     cout << script_label + "Extracting " + descriptorName + " features..." << endl;
     switch(descriptorId) { // loadBinaryFeatures
         case DESC_BRISK:{
-            int octaves = 4;
-            bool suppressScaleNonmaxima = true;
-            bool rotationInvariant = true;
-            bool scaleInvariant = true;
+            const int octaves = 4;
+            const bool suppressScaleNonmaxima = true;
+            const bool rotationInvariant = true;
+            const bool scaleInvariant = true;
             cv::Ptr <cv::FeatureDetector> brisk_det = new brisk::BriskFeatureDetector(34.0f, octaves, suppressScaleNonmaxima);
             cv::Ptr < cv::DescriptorExtractor > brisk_ext = new brisk::BriskDescriptorExtractor(
                     rotationInvariant, scaleInvariant, brisk::BriskDescriptorExtractor::Version::briskV2);
@@ -133,9 +133,8 @@ void loadBinaryFeatures(vector<vector<cv::Mat>> &features, const std::vector<std
                 cv::Mat mask{};
 
                 brisk_det->detect(image, keypoints);
-
                 brisk_ext->compute(image, keypoints, descriptors);
-                std::cout << keypoints.size() << " " << descriptors.size() << std::endl;
+
                 features.push_back(vector<cv::Mat>());
                 changeStructure(descriptors, features.back());
             }
@@ -309,9 +308,7 @@ void testBinaryVocCreation(const vector<vector<cv::Mat>> &features){
 
     switch (descriptorId) { // create binary vocabulary      
         case DESC_BRISK:{
-            cout << "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa 1"<<endl;
             BriskVocabulary voc(k, L, weight, scoring);
-            cout << "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa 2"<<endl;
             voc.create(features);
             cout << script_label + "Vocabulary information: " << endl
                  << voc << endl << endl;

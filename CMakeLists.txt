@@ -46,18 +46,18 @@ set(DEPENDENCY_DIR ${CMAKE_CURRENT_BINARY_DIR}/dependencies)
 set(DEPENDENCY_INSTALL_DIR ${DEPENDENCY_DIR}/install)
 
 find_package(OpenCV REQUIRED)
-find_package(brisk HINTS "/home/fontan/brisk/cmake")
+find_package(brisk REQUIRED )
 
 add_library(${PROJECT_NAME} SHARED ${SRCS_DBOW2} ${SRCS_DUTILS})
-target_include_directories(${PROJECT_NAME} PUBLIC include/DBoW2/ include/ ${BRISK_INCLUDE_DIRS})
-target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBRARIES} ${BRISK_LIBRARIES})
+target_include_directories(${PROJECT_NAME} PUBLIC include/DBoW2/ include/)
+target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBRARIES} ${brisk_LIBRARIES})
 
 #add_executable(demo executables/demo.cpp)
 #target_link_libraries(demo ${PROJECT_NAME} ${OpenCV_LIBRARIES} ${BRISK_LIBRARIES})
 #file(COPY executables/images DESTINATION ${CMAKE_BINARY_DIR}/)
 
 add_executable(createVocabulary executables/createVocabulary.cpp)
-target_link_libraries(createVocabulary ${PROJECT_NAME} ${OpenCV_LIBRARIES} ${BRISK_LIBRARIES})
+target_link_libraries(createVocabulary ${PROJECT_NAME} ${OpenCV_LIBRARIES} ${brisk_LIBRARIES})
 
 configure_file(src/DBoW2.cmake.in
   "${PROJECT_BINARY_DIR}/DBoW2Config.cmake" @ONLY)
