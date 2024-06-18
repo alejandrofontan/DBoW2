@@ -16,21 +16,17 @@ namespace DBoW2 {
 
 // ---------------------------------------------------------------------------
 
-FeatureVector::FeatureVector(void)
-{
-}
+FeatureVector::FeatureVector(void) = default;
 
 // ---------------------------------------------------------------------------
 
-FeatureVector::~FeatureVector(void)
-{
-}
+FeatureVector::~FeatureVector(void) = default;
 
 // ---------------------------------------------------------------------------
 
 void FeatureVector::addFeature(NodeId id, unsigned int i_feature)
 {
-  FeatureVector::iterator vit = this->lower_bound(id);
+  auto vit = this->lower_bound(id);
   
   if(vit != this->end() && vit->first == id)
   {
@@ -51,7 +47,7 @@ std::ostream& operator<<(std::ostream &out,
 {
   if(!v.empty())
   {
-    FeatureVector::const_iterator vit = v.begin();
+    auto vit = v.begin();
     
     const std::vector<unsigned int>* f = &vit->second;
 

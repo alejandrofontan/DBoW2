@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef __D_T_FEATURE_VECTOR__
-#define __D_T_FEATURE_VECTOR__
+#ifndef D_T_FEATURE_VECTOR_
+#define D_T_FEATURE_VECTOR_
 
 #include "BowVector.h"
 #include <map>
@@ -26,12 +26,12 @@ public:
   /**
    * Constructor
    */
-  FeatureVector(void);
+  FeatureVector();
   
   /**
    * Destructor
    */
-  ~FeatureVector(void);
+  ~FeatureVector();
   
   /**
    * Adds a feature to an existing node, or adds a new node with an initial

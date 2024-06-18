@@ -12,7 +12,6 @@
 
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
 #include <cmath>
 #include <sstream>
 #include <iomanip>
@@ -44,9 +43,7 @@ Timestamp::Timestamp(Timestamp::tOptions option)
     setTime(0.);
 }
 
-Timestamp::~Timestamp(void)
-{
-}
+Timestamp::~Timestamp(void) = default;
 
 bool Timestamp::empty() const
 {
@@ -62,8 +59,8 @@ void Timestamp::setToCurrentTime(){
 	m_secs = timebuffer.time;
 	m_usecs = timebuffer.millitm * 1000;
 #else
-	struct timeval now;
-	gettimeofday(&now, NULL);
+	struct timeval now{};
+	gettimeofday(&now, nullptr);
 	m_secs = now.tv_sec;
 	m_usecs = now.tv_usec;
 #endif
@@ -196,9 +193,9 @@ bool Timestamp::operator== (const Timestamp &t) const
 
 string Timestamp::Format(bool machine_friendly) const 
 {
-  struct tm tm_time;
+  struct tm tm_time{};
 
-  time_t t = (time_t)getFloatTime();
+  auto t = (time_t)getFloatTime();
 
 #ifdef WIN32
   localtime_s(&tm_time, &t);

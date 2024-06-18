@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef __D_T_TEMPLATED_VOCABULARY__
-#define __D_T_TEMPLATED_VOCABULARY__
+#ifndef D_T_TEMPLATED_VOCABULARY_
+#define D_T_TEMPLATED_VOCABULARY_
 
 #include <cassert>
 #include <cstdlib>
@@ -42,20 +42,20 @@ public:
    * @param weighting weighting type
    * @param scoring scoring type
    */
-  TemplatedVocabulary(int k = 10, int L = 5, 
+  explicit TemplatedVocabulary(int k = 10, int L = 5,
     WeightingType weighting = TF_IDF, ScoringType scoring = L1_NORM);
   
   /**
    * Creates the vocabulary by loading a file
    * @param filename
    */
-  TemplatedVocabulary(const std::string &filename);
+  explicit TemplatedVocabulary(const std::string &filename);
   
   /**
    * Creates the vocabulary by loading a file
    * @param filename
    */
-  TemplatedVocabulary(const char *filename);
+  explicit TemplatedVocabulary(const char *filename);
   
   /** 
    * Copy constructor
@@ -109,13 +109,13 @@ public:
    * Returns the number of words in the vocabulary
    * @return number of words
    */
-  virtual inline unsigned int size() const;
+  [[nodiscard]] virtual inline unsigned int size() const;
   
   /**
    * Returns whether the vocabulary is empty (i.e. it has not been trained)
    * @return true iff the vocabulary is empty
    */
-  virtual inline bool empty() const;
+  [[nodiscard]] virtual inline bool empty() const;
 
   /**
    * Transforms a set of descriptores into a bow vector
@@ -149,7 +149,7 @@ public:
    * @return score between vectors
    * @note the vectors must be already sorted and normalized if necessary
    */
-  inline double score(const BowVector &a, const BowVector &b) const;
+  [[nodiscard]] inline double score(const BowVector &v1, const BowVector &v2) const;
   
   /**
    * Returns the id of the node that is "levelsup" levels from the word given
@@ -158,7 +158,7 @@ public:
    * @return node id. if levelsup is 0, returns the node id associated to the
    *   word id
    */
-  virtual NodeId getParentNode(WordId wid, int levelsup) const;
+  [[nodiscard]] virtual NodeId getParentNode(WordId wid, int levelsup) const;
   
   /**
    * Returns the ids of all the words that are under the given node id,
@@ -172,19 +172,19 @@ public:
    * Returns the branching factor of the tree (k)
    * @return k
    */
-  inline int getBranchingFactor() const { return m_k; }
+  [[nodiscard]] inline int getBranchingFactor() const { return m_k; }
   
   /** 
    * Returns the depth levels of the tree (L)
    * @return L
    */
-  inline int getDepthLevels() const { return m_L; }
+  [[nodiscard]] inline int getDepthLevels() const { return m_L; }
   
   /**
    * Returns the real depth levels of the tree on average
    * @return average of depth levels of leaves
    */
-  float getEffectiveLevels() const;
+  [[nodiscard]] float getEffectiveLevels() const;
   
   /**
    * Returns the descriptor of a word
@@ -198,19 +198,19 @@ public:
    * @param wid word id
    * @return weight
    */
-  virtual inline WordValue getWordWeight(WordId wid) const;
+  [[nodiscard]] virtual inline WordValue getWordWeight(WordId wid) const;
   
   /** 
    * Returns the weighting method
    * @return weighting method
    */
-  inline WeightingType getWeightingType() const { return m_weighting; }
+  [[nodiscard]] inline WeightingType getWeightingType() const { return m_weighting; }
   
   /** 
    * Returns the scoring method
    * @return scoring method
    */
-  inline ScoringType getScoringType() const { return m_scoring; }
+  [[nodiscard]] inline ScoringType getScoringType() const { return m_scoring; }
   
   /**
    * Changes the weighting method
@@ -309,13 +309,13 @@ protected:
      * Constructor
      * @param _id node id
      */
-    Node(NodeId _id): id(_id), weight(0), parent(0), word_id(0){}
+    explicit Node(NodeId _id): id(_id), weight(0), parent(0), word_id(0){}
 
     /**
      * Returns whether the node is a leaf node
      * @return true iff the node is a leaf
      */
-    inline bool isLeaf() const { return children.empty(); }
+    [[nodiscard]] inline bool isLeaf() const { return children.empty(); }
   };
 
 protected:
@@ -343,7 +343,7 @@ protected:
    * @param levelsup
    */
   virtual void transform(const TDescriptor &feature, 
-    WordId &id, WordValue &weight, NodeId* nid = NULL, int levelsup = 0) const;
+    WordId &id, WordValue &weight, NodeId* nid = nullptr, int levelsup = 0) const;
 
   /**
    * Returns the word id associated to a feature
@@ -376,7 +376,7 @@ protected:
    * @param descriptors 
    * @param clusters resulting clusters
    */
-  void initiateClustersKMpp(const std::vector<pDescriptor> &descriptors,
+  void initiateClustersKMpp(const std::vector<pDescriptor> &pfeatures,
     std::vector<TDescriptor> &clusters) const;
   
   /**
@@ -417,10 +417,10 @@ protected:
 protected:
 
   /// Branching factor
-  int m_k;
+  int m_k{};
   
   /// Depth levels 
-  int m_L;
+  int m_L{};
   
   /// Weighting method
   WeightingType m_weighting;
@@ -446,7 +446,7 @@ template<class TDescriptor, class F>
 TemplatedVocabulary<TDescriptor,F>::TemplatedVocabulary
   (int k, int L, WeightingType weighting, ScoringType scoring)
   : m_k(k), m_L(L), m_weighting(weighting), m_scoring(scoring),
-  m_scoring_object(NULL)
+  m_scoring_object(nullptr)
 {
   createScoringObject();
 }
@@ -455,7 +455,7 @@ TemplatedVocabulary<TDescriptor,F>::TemplatedVocabulary
 
 template<class TDescriptor, class F>
 TemplatedVocabulary<TDescriptor,F>::TemplatedVocabulary
-  (const std::string &filename): m_scoring_object(NULL)
+  (const std::string &filename): m_scoring_object(nullptr)
 {
   load(filename);
 }
@@ -464,7 +464,7 @@ TemplatedVocabulary<TDescriptor,F>::TemplatedVocabulary
 
 template<class TDescriptor, class F>
 TemplatedVocabulary<TDescriptor,F>::TemplatedVocabulary
-  (const char *filename): m_scoring_object(NULL)
+  (const char *filename): m_scoring_object(nullptr)
 {
   load(filename);
 }
@@ -475,7 +475,7 @@ template<class TDescriptor, class F>
 void TemplatedVocabulary<TDescriptor,F>::createScoringObject()
 {
   delete m_scoring_object;
-  m_scoring_object = NULL;
+  m_scoring_object = nullptr;
   
   switch(m_scoring)
   {
@@ -644,7 +644,7 @@ void TemplatedVocabulary<TDescriptor,F>::setWeightingType(WeightingType type)
 template<class TDescriptor, class F>
 TemplatedVocabulary<TDescriptor,F>::TemplatedVocabulary(
   const TemplatedVocabulary<TDescriptor, F> &voc)
-  : m_scoring_object(NULL)
+  : m_scoring_object(nullptr)
 {
   *this = voc;
 }
@@ -810,7 +810,7 @@ void TemplatedVocabulary<TDescriptor,F>::HKmeansStep(NodeId parent_id,
     {
       // 1. Calculate clusters
 
-			if(first_time)
+      if(first_time)
 			{
         // random sample 
         initiateClusters(descriptors, clusters);
@@ -1225,8 +1225,8 @@ void TemplatedVocabulary<TDescriptor,F>::transform(
     {
       // unnecessary when normalizing
       const double nd = v.size();
-      for(BowVector::iterator vit = v.begin(); vit != v.end(); vit++) 
-        vit->second /= nd;
+      for(auto & vit : v)
+        vit.second /= nd;
     }
     
   }
@@ -1293,8 +1293,8 @@ void TemplatedVocabulary<TDescriptor,F>::transform(
     {
       // unnecessary when normalizing
       const double nd = v.size();
-      for(BowVector::iterator vit = v.begin(); vit != v.end(); vit++) 
-        vit->second /= nd;
+      for(auto & vit : v)
+        vit.second /= nd;
     }
   
   }
@@ -1352,7 +1352,7 @@ void TemplatedVocabulary<TDescriptor,F>::transform(const TDescriptor &feature,
 
   // level at which the node must be stored in nid, if given
   const int nid_level = m_L - levelsup;
-  if(nid_level <= 0 && nid != NULL) *nid = 0; // root
+  if(nid_level <= 0 && nid != nullptr) *nid = 0; // root
 
   NodeId final_id = 0; // root
   int current_level = 0;
@@ -1376,7 +1376,7 @@ void TemplatedVocabulary<TDescriptor,F>::transform(const TDescriptor &feature,
       }
     }
     
-    if(nid != NULL && current_level == nid_level)
+    if(nid != nullptr && current_level == nid_level)
       *nid = final_id;
     
   } while( !m_nodes[final_id].isLeaf() );
@@ -1465,7 +1465,7 @@ int TemplatedVocabulary<TDescriptor,F>::stopWords(double minWeight)
 template<class TDescriptor, class F>
 void TemplatedVocabulary<TDescriptor,F>::save(const std::string &filename) const
 {
-  cv::FileStorage fs(filename.c_str(), cv::FileStorage::WRITE);
+  cv::FileStorage fs(filename, cv::FileStorage::WRITE);
   if(!fs.isOpened()) throw std::string("Could not open file ") + filename;
   
   save(fs);
@@ -1476,7 +1476,7 @@ void TemplatedVocabulary<TDescriptor,F>::save(const std::string &filename) const
 template<class TDescriptor, class F>
 void TemplatedVocabulary<TDescriptor,F>::load(const std::string &filename)
 {
-  cv::FileStorage fs(filename.c_str(), cv::FileStorage::READ);
+  cv::FileStorage fs(filename, cv::FileStorage::READ);
   if(!fs.isOpened()) throw std::string("Could not open file ") + filename;
   
   this->load(fs);
@@ -1603,12 +1603,12 @@ void TemplatedVocabulary<TDescriptor,F>::load(const cv::FileStorage &fs,
   m_nodes.resize(fn.size() + 1); // +1 to include root
   m_nodes[0].id = 0;
 
-  for(unsigned int i = 0; i < fn.size(); ++i)
+  for(auto && i : fn)
   {
-    NodeId nid = (int)fn[i]["nodeId"];
-    NodeId pid = (int)fn[i]["parentId"];
-    WordValue weight = (WordValue)fn[i]["weight"];
-    std::string d = (std::string)fn[i]["descriptor"];
+    NodeId nid = (int)i["nodeId"];
+    NodeId pid = (int)i["parentId"];
+    WordValue weight = (WordValue)i["weight"];
+    std::string d = (std::string)i["descriptor"];
     
     m_nodes[nid].id = nid;
     m_nodes[nid].parent = pid;
@@ -1623,10 +1623,10 @@ void TemplatedVocabulary<TDescriptor,F>::load(const cv::FileStorage &fs,
   
   m_words.resize(fn.size());
 
-  for(unsigned int i = 0; i < fn.size(); ++i)
+  for(auto && i : fn)
   {
-    NodeId wid = (int)fn[i]["wordId"];
-    NodeId nid = (int)fn[i]["nodeId"];
+    NodeId wid = (int)i["wordId"];
+    NodeId nid = (int)i["nodeId"];
     
     m_nodes[nid].word_id = wid;
     m_words[wid] = &m_nodes[nid];

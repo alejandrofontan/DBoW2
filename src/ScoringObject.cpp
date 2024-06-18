@@ -23,8 +23,8 @@ const double GeneralScoring::LOG_EPS = log(DBL_EPSILON); // FLT_EPSILON
 double L1Scoring::score(const BowVector &v1, const BowVector &v2) const
 {
   BowVector::const_iterator v1_it, v2_it;
-  const BowVector::const_iterator v1_end = v1.end();
-  const BowVector::const_iterator v2_end = v2.end();
+  const auto v1_end = v1.end();
+  const auto v2_end = v2.end();
   
   v1_it = v1.begin();
   v2_it = v2.begin();
@@ -73,8 +73,8 @@ double L1Scoring::score(const BowVector &v1, const BowVector &v2) const
 double L2Scoring::score(const BowVector &v1, const BowVector &v2) const
 {
   BowVector::const_iterator v1_it, v2_it;
-  const BowVector::const_iterator v1_end = v1.end();
-  const BowVector::const_iterator v2_end = v2.end();
+  const auto v1_end = v1.end();
+  const auto v2_end = v2.end();
   
   v1_it = v1.begin();
   v2_it = v2.begin();
@@ -126,8 +126,8 @@ double ChiSquareScoring::score(const BowVector &v1, const BowVector &v2)
   const
 {
   BowVector::const_iterator v1_it, v2_it;
-  const BowVector::const_iterator v1_end = v1.end();
-  const BowVector::const_iterator v2_end = v2.end();
+  const auto v1_end = v1.end();
+  const auto v2_end = v2.end();
   
   v1_it = v1.begin();
   v2_it = v2.begin();
@@ -175,8 +175,8 @@ double ChiSquareScoring::score(const BowVector &v1, const BowVector &v2)
 double KLScoring::score(const BowVector &v1, const BowVector &v2) const
 { 
   BowVector::const_iterator v1_it, v2_it;
-  const BowVector::const_iterator v1_end = v1.end();
-  const BowVector::const_iterator v2_end = v2.end();
+  const auto v1_end = v1.end();
+  const auto v2_end = v2.end();
   
   v1_it = v1.begin();
   v2_it = v2.begin();
@@ -227,8 +227,8 @@ double BhattacharyyaScoring::score(const BowVector &v1,
   const BowVector &v2) const
 {
   BowVector::const_iterator v1_it, v2_it;
-  const BowVector::const_iterator v1_end = v1.end();
-  const BowVector::const_iterator v2_end = v2.end();
+  const auto v1_end = v1.end();
+  const auto v2_end = v2.end();
   
   v1_it = v1.begin();
   v2_it = v2.begin();
@@ -272,8 +272,8 @@ double DotProductScoring::score(const BowVector &v1,
   const BowVector &v2) const
 {
   BowVector::const_iterator v1_it, v2_it;
-  const BowVector::const_iterator v1_end = v1.end();
-  const BowVector::const_iterator v2_end = v2.end();
+  const auto v1_end = v1.end();
+  const auto v2_end = v2.end();
   
   v1_it = v1.begin();
   v2_it = v2.begin();

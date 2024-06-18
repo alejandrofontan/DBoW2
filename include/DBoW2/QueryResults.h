@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef __D_T_QUERY_RESULTS__
-#define __D_T_QUERY_RESULTS__
+#ifndef D_T_QUERY_RESULTS_
+#define D_T_QUERY_RESULTS_
 
 #include <vector>
 
@@ -23,29 +23,29 @@ class Result
 public:
   
   /// Entry id
-  EntryId Id;
+  EntryId Id{};
   
   /// Score obtained
-  double Score;
+  double Score{};
   
   /// debug
-  int nWords; // words in common
+  int nWords{}; // words in common
   // !!! this is filled only by Bhatt score!
   // (and for BCMatching, BCThresholding then)
   
-  double bhatScore, chiScore;
+  double bhatScore{}, chiScore{};
   /// debug
   
   // only done by ChiSq and BCThresholding 
-  double sumCommonVi;
-  double sumCommonWi;
-  double expectedChiScore;
+  double sumCommonVi{};
+  double sumCommonWi{};
+  double expectedChiScore{};
   /// debug
 
   /**
    * Empty constructors
    */
-  inline Result(){}
+  inline Result()= default;
   
   /**
    * Creates a result with the given data
@@ -193,8 +193,8 @@ public:
 
 inline void QueryResults::scaleScores(double factor)
 {
-  for(QueryResults::iterator qit = begin(); qit != end(); ++qit) 
-    qit->Score *= factor;
+  for(auto & qit : *this)
+    qit.Score *= factor;
 }
 
 // --------------------------------------------------------------------------

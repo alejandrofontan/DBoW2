@@ -5,6 +5,7 @@ include(ExternalProject)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -O3 -march=native")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O3 -march=native")
 set (CMAKE_CXX_STANDARD 17)
+SET(CMAKE_BUILD_TYPE Release)
 
 add_compile_options(-Wextra -Wpedantic)
 
@@ -20,6 +21,8 @@ set(HDRS_DBOW2
   include/DBoW2/FSurf64.h
   include/DBoW2/FBrisk.h
   include/DBoW2/FAkaze61.h
+  include/DBoW2/FAnyFeatBin.h
+  include/DBoW2/FAnyFeatNonBin.h
   )
   
 set(SRCS_DBOW2 
@@ -32,6 +35,8 @@ set(SRCS_DBOW2
   src/FSurf64.cpp
   src/FBrisk.cpp
   src/FAkaze61.cpp
+  src/FAnyFeatBin.cpp
+  src/FAnyFeatNonBin.cpp
 )
   
 set(HDRS_DUTILS
@@ -73,7 +78,7 @@ install(DIRECTORY
         DESTINATION  ${CMAKE_INSTALL_PREFIX}/include/DBoW2
         FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
 
-install(TARGETS createVocabulary DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+#install(TARGETS createVocabulary DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
         
 install(DIRECTORY include/DBoW2 DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
 

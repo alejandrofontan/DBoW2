@@ -9,11 +9,12 @@
  */
 
 #pragma once
-#ifndef __D_RANDOM__
-#define __D_RANDOM__
+#ifndef D_RANDOM_
+#define D_RANDOM_
 
 #include <cstdlib>
 #include <vector>
+#include <random>
 
 namespace DUtils {
 
@@ -54,7 +55,10 @@ public:
 	 */
 	template <class T>
 	static T RandomValue(){
-		return (T)rand()/(T)RAND_MAX;
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<> distrib(0, RAND_MAX);
+        return (T) distrib(gen);
 	}
 
 	/**
@@ -119,7 +123,7 @@ public:
    * @param max
    */
   UnrepeatedRandomizer(int min, int max);
-  ~UnrepeatedRandomizer(){}
+  ~UnrepeatedRandomizer()= default;
   
   /**
    * Copies a randomizer
@@ -146,13 +150,13 @@ public:
    * is the same than after creating the randomizer
    * @return true iff all the values were returned
    */
-  inline bool empty() const { return m_values.empty(); }
+  [[nodiscard]] inline bool empty() const { return m_values.empty(); }
   
   /**
    * Returns the number of values still to be returned
    * @return amount of values to return
    */
-  inline unsigned int left() const { return m_values.size(); }
+  [[nodiscard]] inline unsigned int left() const { return m_values.size(); }
   
   /**
    * Resets the randomizer as it were just created
@@ -169,9 +173,9 @@ protected:
 protected:
 
   /// Min of range of values
-  int m_min;
+  int m_min{};
   /// Max of range of values
-  int m_max;
+  int m_max{};
 
   /// Available values
   std::vector<int> m_values;

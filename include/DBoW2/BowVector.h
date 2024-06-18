@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef __D_T_BOW_VECTOR__
-#define __D_T_BOW_VECTOR__
+#ifndef D_T_BOW_VECTOR_
+#define D_T_BOW_VECTOR_
 
 #include <iostream>
 #include <map>
@@ -61,12 +61,12 @@ public:
 	/** 
 	 * Constructor
 	 */
-	BowVector(void);
+	BowVector();
 
 	/**
 	 * Destructor
 	 */
-	~BowVector(void);
+	~BowVector();
 	
 	/**
 	 * Adds a value to a word value existing in the vector, or creates a new

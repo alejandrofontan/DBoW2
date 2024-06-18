@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef __D_TIMESTAMP__
-#define __D_TIMESTAMP__
+#ifndef D_TIMESTAMP_
+#define D_TIMESTAMP_
 
 #include <iostream>
 using namespace std;
@@ -34,19 +34,19 @@ public:
    * Creates a timestamp 
    * @param option option to set the initial time stamp
    */
-	Timestamp(Timestamp::tOptions option = NONE);
+	explicit Timestamp(Timestamp::tOptions option = NONE);
 	
 	/**
 	 * Destructor
 	 */
-	virtual ~Timestamp(void);
+	virtual ~Timestamp();
 
   /**
    * Says if the timestamp is "empty": seconds and usecs are both 0, as 
    * when initiated with the ZERO flag
    * @return true iif secs == usecs == 0
    */
-  bool empty() const;
+  [[nodiscard]] bool empty() const;
 
 	/**
 	 * Sets this instance to the current time
@@ -89,12 +89,12 @@ public:
 	/**
 	 * Returns this timestamp as the number of seconds in (long) float format
 	 */
-	double getFloatTime() const;
+	[[nodiscard]] double getFloatTime() const;
 
 	/**
 	 * Returns this timestamp as the number of seconds in fixed length string format
 	 */
-	string getStringTime() const;
+	[[nodiscard]] string getStringTime() const;
 
 	/**
 	 * Returns the difference in seconds between this timestamp (greater) and t (smaller)
@@ -109,14 +109,14 @@ public:
 	 * @param s seconds
 	 * @param us microseconds
 	 */
-	Timestamp plus(unsigned long s, unsigned long us) const;
+	[[nodiscard]] Timestamp plus(unsigned long s, unsigned long us) const;
 
   /**
    * Returns a copy of this timestamp - s seconds - us microseconds
    * @param s seconds
    * @param us microseconds
    */
-  Timestamp minus(unsigned long s, unsigned long us) const;
+  [[nodiscard]] Timestamp minus(unsigned long s, unsigned long us) const;
 
   /**
    * Adds s seconds to this timestamp and returns a reference to itself
@@ -181,7 +181,7 @@ public:
    * @note This has not been tested under Windows
    * @note The timestamp is truncated to seconds
    */
-  string Format(bool machine_friendly = false) const;
+  [[nodiscard]] string Format(bool machine_friendly = false) const;
 
 	/**
 	 * Returns a string version of the elapsed time in seconds, with the format
@@ -193,9 +193,9 @@ public:
 
 protected:
   /// Seconds
-	unsigned long m_secs;	// seconds
+	unsigned long m_secs{};	// seconds
 	/// Microseconds
-	unsigned long m_usecs;	// microseconds
+	unsigned long m_usecs{};	// microseconds
 };
 
 }

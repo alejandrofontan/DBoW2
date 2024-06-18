@@ -46,7 +46,11 @@ void DUtils::Random::SeedRandOnce(int seed)
 
 int DUtils::Random::RandomInt(int min, int max){
 	int d = max - min + 1;
-	return int(((double)rand()/((double)RAND_MAX + 1.0)) * d) + min;
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> distrib(0, RAND_MAX);
+    double randNumber = distrib(gen);
+	return int((randNumber/((double)RAND_MAX + 1.0)) * d) + min;
 }
 
 // ---------------------------------------------------------------------------

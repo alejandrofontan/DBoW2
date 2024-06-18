@@ -10,7 +10,6 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include <algorithm>
 #include <cmath>
 
 #include "BowVector.h"
@@ -20,20 +19,18 @@ namespace DBoW2 {
 // --------------------------------------------------------------------------
 
 BowVector::BowVector(void)
-{
-}
+= default;
 
 // --------------------------------------------------------------------------
 
 BowVector::~BowVector(void)
-{
-}
+= default;
 
 // --------------------------------------------------------------------------
 
 void BowVector::addWeight(WordId id, WordValue v)
 {
-  BowVector::iterator vit = this->lower_bound(id);
+  auto vit = this->lower_bound(id);
   
   if(vit != this->end() && !(this->key_comp()(id, vit->first)))
   {
@@ -49,7 +46,7 @@ void BowVector::addWeight(WordId id, WordValue v)
 
 void BowVector::addIfNotExist(WordId id, WordValue v)
 {
-  BowVector::iterator vit = this->lower_bound(id);
+  auto vit = this->lower_bound(id);
   
   if(vit == this->end() || (this->key_comp()(id, vit->first)))
   {

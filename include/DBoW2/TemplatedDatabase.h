@@ -7,8 +7,8 @@
  *
  */
  
-#ifndef __D_T_TEMPLATED_DATABASE__
-#define __D_T_TEMPLATED_DATABASE__
+#ifndef D_T_TEMPLATED_DATABASE_
+#define D_T_TEMPLATED_DATABASE_
 
 #include <vector>
 #include <numeric>
@@ -66,18 +66,18 @@ public:
    * Creates the database from a file
    * @param filename
    */
-  TemplatedDatabase(const std::string &filename);
+  explicit TemplatedDatabase(const std::string &filename);
 
   /** 
    * Creates the database from a file
    * @param filename
    */
-  TemplatedDatabase(const char *filename);
+  explicit TemplatedDatabase(const char *filename);
 
   /**
    * Destructor
    */
-  virtual ~TemplatedDatabase(void);
+  virtual ~TemplatedDatabase();
 
   /**
    * Copies the given database and its vocabulary
@@ -128,7 +128,7 @@ public:
    * @return id of new entry
    */
   EntryId add(const std::vector<TDescriptor> &features,
-    BowVector *bowvec = NULL, FeatureVector *fvec = NULL);
+    BowVector *bowvec = nullptr, FeatureVector *fvec = nullptr);
 
   /**
    * Adss an entry to the database and returns its index
@@ -138,7 +138,7 @@ public:
    * @return id of new entry
    */
   EntryId add(const BowVector &vec, 
-    const FeatureVector &fec = FeatureVector() );
+    const FeatureVector &fv = FeatureVector() );
 
   /**
    * Empties the database
@@ -149,19 +149,19 @@ public:
    * Returns the number of entries in the database 
    * @return number of entries in the database
    */
-  inline unsigned int size() const;
+  [[nodiscard]] inline unsigned int size() const;
   
   /**
    * Checks if the direct index is being used
    * @return true iff using direct index
    */
-  inline bool usingDirectIndex() const;
+  [[nodiscard]] inline bool usingDirectIndex() const;
   
   /**
    * Returns the di levels when using direct index
    * @return di levels
    */
-  inline int getDirectIndexLevels() const;
+  [[nodiscard]] inline int getDirectIndexLevels() const;
   
   /**
    * Queries the database with some features
@@ -191,7 +191,7 @@ public:
    * @return const reference to map of nodes and their associated features in
    *   the given entry
    */
-  const FeatureVector& retrieveFeatures(EntryId id) const;
+  [[nodiscard]] const FeatureVector& retrieveFeatures(EntryId id) const;
 
   /**
    * Stores the database in a file
@@ -255,15 +255,15 @@ protected:
   struct IFPair
   {
     /// Entry id
-    EntryId entry_id;
+    EntryId entry_id{};
     
     /// Word weight in this entry
-    WordValue word_weight;
+    WordValue word_weight{};
     
     /**
      * Creates an empty pair
      */
-    IFPair(){}
+    IFPair()= default;
     
     /**
      * Creates an inverted file pair
@@ -313,7 +313,7 @@ protected:
   DirectFile m_dfile;
   
   /// Number of valid entries in m_dfile
-  int m_nentries;
+  int m_nentries{};
   
 };
 
@@ -371,7 +371,7 @@ TemplatedDatabase<TDescriptor, F>::TemplatedDatabase
 // --------------------------------------------------------------------------
 
 template<class TDescriptor, class F>
-TemplatedDatabase<TDescriptor, F>::~TemplatedDatabase(void)
+TemplatedDatabase<TDescriptor, F>::~TemplatedDatabase()
 {
   delete m_voc;
 }
@@ -404,7 +404,7 @@ EntryId TemplatedDatabase<TDescriptor, F>::add(
   BowVector aux;
   BowVector& v = (bowvec ? *bowvec : aux);
   
-  if(m_use_di && fvec != NULL)
+  if(m_use_di && fvec != nullptr)
   {
     m_voc->transform(features, v, *fvec, m_dilevels); // with features
     return add(v, *fvec);
@@ -415,7 +415,7 @@ EntryId TemplatedDatabase<TDescriptor, F>::add(
     m_voc->transform(features, v, fv, m_dilevels); // with features
     return add(v, fv);
   }
-  else if(fvec != NULL)
+  else if(fvec != nullptr)
   {
     m_voc->transform(features, v, *fvec, m_dilevels); // with features
     return add(v);
@@ -1127,7 +1127,7 @@ const FeatureVector& TemplatedDatabase<TDescriptor, F>::retrieveFeatures
 template<class TDescriptor, class F>
 void TemplatedDatabase<TDescriptor, F>::save(const std::string &filename) const
 {
-  cv::FileStorage fs(filename.c_str(), cv::FileStorage::WRITE);
+  cv::FileStorage fs(filename, cv::FileStorage::WRITE);
   if(!fs.isOpened()) throw std::string("Could not open file ") + filename;
   
   save(fs);
@@ -1235,7 +1235,7 @@ void TemplatedDatabase<TDescriptor, F>::save(cv::FileStorage &fs,
 template<class TDescriptor, class F>
 void TemplatedDatabase<TDescriptor, F>::load(const std::string &filename)
 {
-  cv::FileStorage fs(filename.c_str(), cv::FileStorage::READ);
+  cv::FileStorage fs(filename, cv::FileStorage::READ);
   if(!fs.isOpened()) throw std::string("Could not open file ") + filename;
   
   load(fs);
@@ -1267,10 +1267,10 @@ void TemplatedDatabase<TDescriptor, F>::load(const cv::FileStorage &fs,
   {
     cv::FileNode fw = fn[wid];
     
-    for(unsigned int i = 0; i < fw.size(); ++i)
+    for(auto && i : fw)
     {
-      EntryId eid = (int)fw[i]["imageId"];
-      WordValue v = fw[i]["weight"];
+      EntryId eid = (int)i["imageId"];
+      WordValue v = i["weight"];
       
       m_ifile[wid].push_back(IFPair(eid, v));
     }
@@ -1289,9 +1289,9 @@ void TemplatedDatabase<TDescriptor, F>::load(const cv::FileStorage &fs,
       cv::FileNode fe = fn[eid];
       
       m_dfile[eid].clear();
-      for(unsigned int i = 0; i < fe.size(); ++i)
+      for(auto && i : fe)
       {
-        NodeId nid = (int)fe[i]["nodeId"];
+        NodeId nid = (int)i["nodeId"];
         
         dit = m_dfile[eid].insert(m_dfile[eid].end(), 
           make_pair(nid, std::vector<unsigned int>() ));
@@ -1305,7 +1305,7 @@ void TemplatedDatabase<TDescriptor, F>::load(const cv::FileStorage &fs,
         //dit->second.resize(aux.size());
         //std::copy(aux.begin(), aux.end(), dit->second.begin());
         
-        cv::FileNode ff = fe[i]["features"][0];
+        cv::FileNode ff = i["features"][0];
         dit->second.reserve(ff.size());
                 
         cv::FileNodeIterator ffit;

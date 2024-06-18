@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef __D_T_SCORING_OBJECT__
-#define __D_T_SCORING_OBJECT__
+#ifndef D_T_SCORING_OBJECT_
+#define D_T_SCORING_OBJECT_
 
 #include "BowVector.h"
 
@@ -25,7 +25,7 @@ public:
    * @param w (in/out)
    * @return score
    */
-  virtual double score(const BowVector &v, const BowVector &w) const = 0;
+  [[nodiscard]] virtual double score(const BowVector &v, const BowVector &w) const = 0;
 
   /**
    * Returns whether a vector must be normalized before scoring according
@@ -40,7 +40,7 @@ public:
   // If you change the type of WordValue, make sure you change also the
 	// epsilon value (this is needed by the KL method)
 	
-  virtual ~GeneralScoring() {} //!< Required for virtual base classes	
+  virtual ~GeneralScoring() = default; //!< Required for virtual base classes
 };
 
 /** 

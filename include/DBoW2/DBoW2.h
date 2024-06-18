@@ -41,8 +41,8 @@
  *
  */
 
-#ifndef __D_T_DBOW2__
-#define __D_T_DBOW2__
+#ifndef D_T_DBOW2_
+#define D_T_DBOW2_
 
 /// Includes all the data structures to manage vocabularies and image databases
 namespace DBoW2
@@ -63,8 +63,22 @@ namespace DBoW2
 #include "FSurf64.h"
 #include "FBrisk.h"
 #include "FAkaze61.h"
+#include "FAnyFeatBin.h"
+#include "FAnyFeatNonBin.h"
 
 // Vocabulary Templates
+
+/// AnyFeat Vocabulary
+typedef DBoW2::TemplatedVocabulary<DBoW2::FAnyFeatNonBin::TDescriptor, DBoW2::FAnyFeatNonBin> AnyFeatNonBinVocabulary;
+
+/// AnyFeat Database
+typedef DBoW2::TemplatedDatabase<DBoW2::FAnyFeatNonBin::TDescriptor, DBoW2::FAnyFeatNonBin> AnyFeatNonBinDatabase;
+
+/// AnyFeat Vocabulary
+typedef DBoW2::TemplatedVocabulary<DBoW2::FAnyFeatBin::TDescriptor, DBoW2::FAnyFeatBin> AnyFeatBinVocabulary;
+
+/// AnyFeat Database
+typedef DBoW2::TemplatedDatabase<DBoW2::FAnyFeatBin::TDescriptor, DBoW2::FAnyFeatBin> AnyFeatBinDatabase;
 
 /// R2d2 Vocabulary
 typedef DBoW2::TemplatedVocabulary<DBoW2::FR2d2::TDescriptor, DBoW2::FR2d2> R2d2Vocabulary;
