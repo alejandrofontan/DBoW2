@@ -1644,7 +1644,7 @@ template<class TDescriptor, class F>
 std::ostream& operator<<(std::ostream &os, 
   const TemplatedVocabulary<TDescriptor,F> &voc)
 {
-  os << "Vocabulary: k = " << voc.getBranchingFactor() 
+  os << "    Vocabulary: k = " << voc.getBranchingFactor()
     << ", L = " << voc.getDepthLevels()
     << ", Weighting = ";
 
