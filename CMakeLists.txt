@@ -64,7 +64,7 @@ set(SRCS_DUTILS
 find_package(OpenCV REQUIRED)
 find_package(brisk REQUIRED)
 find_package(akaze REQUIRED)
-find_package(SiftGPU REQUIRED)
+find_package(SiftGPU CONFIG REQUIRED)
 
 add_library(${PROJECT_NAME} SHARED ${SRCS_DBOW2} ${SRCS_DUTILS})
 
@@ -79,7 +79,7 @@ target_link_libraries(${PROJECT_NAME}
 	${OpenCV_LIBRARIES}
 	${brisk_LIBRARIES}
 	${akaze_LIBRARIES}
-	${SiftGPU_LIBRARIES}
+	SiftGPU::sift_gpu
 )
 
 add_executable(createVocabulary executables/createVocabulary.cpp)
