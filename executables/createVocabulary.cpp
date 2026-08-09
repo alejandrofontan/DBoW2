@@ -207,7 +207,7 @@ void loadNonBinaryFeatures(vector<vector<vector<float>>> &features, const std::v
                 scores_path = replaceAllOccurrences(scores_path, "png", "bin");
                 std::vector<std::vector<float>> keypointFloats = loadBinFile(keypoints_path,3);
                 std::vector<std::vector<float>> scoreFloats = loadBinFile(scores_path,1);
-                for(int iKeyPt{0}; iKeyPt < keypointFloats.size(); iKeyPt++){
+                for(size_t iKeyPt{0}; iKeyPt < keypointFloats.size(); iKeyPt++){
                     std::vector<float> lineScores    =  scoreFloats[iKeyPt];
                     std::vector<float> lineKeypoints =  keypointFloats[iKeyPt];
                     float response = float(lineScores[0]);
@@ -414,7 +414,7 @@ std::vector<std::vector<std::string>> read_txt(const std::string &filePath, cons
         while (getline(file, line)) {
             std::stringstream line_stream(line);
             std::vector <std::string> row{};
-            for (int jRow{0}; jRow < numCols; jRow++) {
+            for (size_t jRow{0}; jRow < numCols; jRow++) {
                 getline(line_stream, word, delimiter);
                 row.push_back(word);
             }

@@ -13,7 +13,17 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 
 # Compiler flags
+# -Wno-overloaded-virtual: every FXxx descriptor-family class (FOrb, FBrief, FSift128, ...)
+# intentionally hides FClass::meanValue with its own differently-typed static meanValue --
+# FClass is used purely as a compile-time "concept" (consumed via the F template parameter in
+# TemplatedVocabulary, never through virtual dispatch: confirmed no FClass*/FClass& exists
+# anywhere in this codebase), and meanValue is private in FClass so the standard
+# `using FClass::meanValue;` fix isn't even legal here. Silencing this warning class instead of
+# restructuring FClass's access levels (upstream design, not ours to change). Scoped to CXX only
+# (via generator expression) since -Woverloaded-virtual is a C++-only concept and this directory
+# has no C sources today, but a bare flag would still warn if one were ever added.
 add_compile_options(-Wall -Wextra -Wpedantic -O3 -march=native)
+add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wno-overloaded-virtual>)
 
 set(HDRS_DBOW2
   include/DBoW2/BowVector.h           
